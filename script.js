@@ -208,3 +208,126 @@ btnNext.addEventListener('click', () => {
 });
 
 newRound();
+
+// --- Musterdepot ---
+
+const DEPOT_STORAGE_KEY = 'boersenspiel_depot';
+const DEPOT_START_CASH = 10000;
+const DEPOT_BUY_AMOUNT = 500;
+
+const DEPOT_STOCKS_DEFAULT = [
+  { id: 'tech', name: 'TechCorp', price: 120 },
+  { id: 'green', name: 'GreenEnergy AG', price: 45 },
+  { id: 'handel', name: 'HandelsKette', price: 80 },
+  { id: 'bio', name: 'BioPharma', price: 200 },
+];
+
+function loadDepot() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(DEPOT_STORAGE_KEY));
+    if (saved && typeof saved.cash === 'number' && saved.stocks) {
+      return saved;
+    }
+  } catch (e) {}
+  return {
+    cash: DEPOT_START_CASH,
+    stocks: DEPOT_STOCKS_DEFAULT.map(s => ({ ...s })),
+    holdings: {},
+  };
+}
+
+let depot = loadDepot();
+
+function saveDepot() {
+  localStorage.setItem(DEPOT_STORAGE_KEY, JSON.stringify(depot));
+}
+
+function formatEuro(n) {
+  return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+function depotHoldingsValue() {
+  return depot.stocks.reduce((sum, s) => sum + (depot.holdings[s.id] || 0) * s.price, 0);
+}
+
+function renderDepot() {
+  const cashEl = document.getElementById('depotCash');
+  const holdingsValueEl = document.getElementById('depotHoldingsValue');
+  const totalEl = document.getElementById('depotTotal');
+  const returnEl = document.getElementById('depotReturn');
+  const list = document.getElementById('depotStocks');
+
+  const holdingsValue = depotHoldingsValue();
+  const total = depot.cash + holdingsValue;
+  const returnPct = ((total - DEPOT_START_CASH) / DEPOT_START_CASH) * 100;
+
+  cashEl.textContent = formatEuro(depot.cash);
+  holdingsValueEl.textContent = formatEuro(holdingsValue);
+  totalEl.textContent = formatEuro(total);
+  returnEl.textContent = (returnPct >= 0 ? '+' : '') + returnPct.toFixed(1) + ' %';
+  returnEl.style.color = returnPct > 0 ? 'var(--green)' : returnPct < 0 ? 'var(--red)' : '';
+
+  list.innerHTML = '';
+  depot.stocks.forEach(stock => {
+    const shares = depot.holdings[stock.id] || 0;
+    const value = shares * stock.price;
+
+    const li = document.createElement('li');
+    li.className = 'stock-row';
+    li.innerHTML = `
+      <div class="stock-info">
+        <span class="stock-name">${stock.name}</span>
+        <span class="stock-price">${formatEuro(stock.price)} je Anteil</span>
+        ${shares > 0 ? `<span class="stock-position">${shares.toFixed(2)} Anteile · ${formatEuro(value)}</span>` : ''}
+      </div>
+      <div class="stock-actions">
+        <button class="mini-btn buy" data-action="buy" data-id="${stock.id}">+ ${DEPOT_BUY_AMOUNT} €</button>
+        <button class="mini-btn sell" data-action="sell" data-id="${stock.id}" ${shares > 0 ? '' : 'disabled'}>Verkaufen</button>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+}
+
+document.getElementById('depotStocks').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  const stock = depot.stocks.find(s => s.id === btn.dataset.id);
+  if (!stock) return;
+
+  if (btn.dataset.action === 'buy') {
+    if (depot.cash < DEPOT_BUY_AMOUNT) return;
+    depot.cash -= DEPOT_BUY_AMOUNT;
+    depot.holdings[stock.id] = (depot.holdings[stock.id] || 0) + DEPOT_BUY_AMOUNT / stock.price;
+  } else if (btn.dataset.action === 'sell') {
+    const shares = depot.holdings[stock.id] || 0;
+    depot.cash += shares * stock.price;
+    depot.holdings[stock.id] = 0;
+  }
+
+  saveDepot();
+  renderDepot();
+});
+
+document.getElementById('depotRefresh').addEventListener('click', () => {
+  depot.stocks.forEach(stock => {
+    const volatility = 0.03;
+    const shock = gaussianRandom() * volatility;
+    stock.price = Math.max(1, stock.price * (1 + shock));
+  });
+  saveDepot();
+  renderDepot();
+});
+
+document.getElementById('depotReset').addEventListener('click', () => {
+  if (!confirm('Depot wirklich zurücksetzen? Dein virtuelles Guthaben und alle Positionen gehen verloren.')) return;
+  depot = {
+    cash: DEPOT_START_CASH,
+    stocks: DEPOT_STOCKS_DEFAULT.map(s => ({ ...s })),
+    holdings: {},
+  };
+  saveDepot();
+  renderDepot();
+});
+
+renderDepot();
