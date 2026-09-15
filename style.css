@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('fonts/outfit-variable.woff2') format('woff2-variations'), url('fonts/outfit-variable.woff2') format('woff2');
+}
+
 :root {
   --bg: #06070d;
   --panel: rgba(255, 255, 255, 0.055);
@@ -866,6 +874,39 @@ canvas {
 }
 
 .modal-panel .controls { margin: 0; }
+
+/* Legal pages (Impressum / Datenschutz) */
+
+.legal-panel h2 {
+  margin: 24px 0 8px;
+  font-size: 1rem;
+}
+
+.legal-panel h2:first-child { margin-top: 0; }
+
+.legal-panel p {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.legal-panel a { color: var(--blue); }
+
+.app-footer {
+  text-align: center;
+  margin-top: 28px;
+  padding-top: 4px;
+}
+
+.app-footer a {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-decoration: none;
+  margin: 0 8px;
+}
+
+.app-footer a:hover { color: var(--text); text-decoration: underline; }
 
 /* Confetti */
 
