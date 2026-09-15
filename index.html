@@ -128,11 +128,15 @@
     <section id="depot-view" class="view hidden">
       <button class="back-btn">← Zurück</button>
 
-      <div class="stats">
-        <div class="stat"><span class="label">Kontostand</span><span id="depotCash" class="value">0 €</span></div>
+      <div class="depot-hero">
+        <span class="depot-hero-label">Kontostand</span>
+        <span id="depotCash" class="depot-hero-value">0 €</span>
+        <span id="depotReturn" class="depot-hero-return">0 %</span>
+      </div>
+
+      <div class="depot-substats">
         <div class="stat"><span class="label">Depotwert</span><span id="depotHoldingsValue" class="value">0 €</span></div>
         <div class="stat"><span class="label">Gesamt</span><span id="depotTotal" class="value">0 €</span></div>
-        <div class="stat"><span class="label">Rendite</span><span id="depotReturn" class="value">0 %</span></div>
       </div>
 
       <div class="panel depot-panel">
