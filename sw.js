@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boersenspiel-v1';
+const CACHE_NAME = 'boersenspiel-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,6 +7,9 @@ const APP_SHELL = [
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './fonts/outfit-variable.woff2',
+  './impressum.html',
+  './datenschutz.html',
 ];
 
 self.addEventListener('install', (event) => {

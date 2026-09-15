@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Börsen-Ratespiel — ein Browser-Spiel zum Üben des Gefühls für Kursverläufe. Man sieht einen simulierten Kursverlauf und tippt, ob es als Nächstes rauf oder runter geht. Reines Vanilla HTML/CSS/JS ohne Build-Step und ohne Abhängigkeiten.
+Börsen-Ratespiel — News, Wissen, ein Ratespiel und ein Musterdepot rund um die Börse, alles simuliert und ohne Risiko. Reines Vanilla HTML/CSS/JS ohne Build-Step und ohne Abhängigkeiten. Als installierbare PWA nutzbar (siehe unten).
 
 ## Running
 
@@ -12,11 +12,13 @@ Einfach `index.html` im Browser öffnen. Kein Build, kein Package-Manager, keine
 
 ## Architecture
 
-Drei Dateien, jede mit klarer Verantwortung:
+Die Single-Page-App (`index.html` + `style.css` + `script.js`) ist der Kern, dazu kommen PWA-Dateien und zwei rechtliche Standalone-Seiten:
 
 - `index.html` — Seitenstruktur: ein Menü (`#menu`) zur Auswahl, plus je eine `<section class="view">` pro Feature (`#news-view`, `#learn-view`, `#game-view`, `#depot-view`)
-- `style.css` — Theme via CSS-Variablen in `:root` (Farben für bg/panel/text/green/red/accent), Glassmorphism-Look (Blur, halbtransparente Panels), Google Font "Outfit"
+- `style.css` — Theme via CSS-Variablen in `:root` (Farben für bg/panel/text/green/red/accent), Glassmorphism-Look (Blur, halbtransparente Panels), lokal gehostete Schriftart "Outfit" (siehe PWA-Abschnitt)
 - `script.js` — Navigations-Logik + gesamte Spiellogik
+- `manifest.json`, `sw.js`, `icons/`, `apple-touch-icon.png`, `favicon.png`, `fonts/` — PWA-Infrastruktur
+- `impressum.html`, `datenschutz.html` — eigenständige Seiten (kein Teil der SPA-Navigation, verlinkt aus dem `.app-footer` in `index.html`), teilen sich aber `style.css` für den gleichen Look
 
 **Navigation:** Die App startet auf dem Menü (`#menu`). Ein Klick auf einen `.menu-item[data-view]`-Button blendet das Menü aus und die passende `.view`-Section ein (per `hidden`-Klasse, siehe `script.js` oben). Der `.back-btn` in jeder View kehrt zum Menü zurück. Neue Features bekommen einfach eine weitere `.view`-Section plus einen Menüpunkt.
 
@@ -41,6 +43,8 @@ Achtung: `.result-panel` hat eine EIGENE Animation (`resultPopIn`) statt der `po
 **Live-Modus im Depot:** „▶️ Simulation starten“ (`depotToggle`) startet `setInterval(tickDepotPrices, DEPOT_TICK_MS)` (1800ms) — Kurse bewegen sich automatisch per Random Walk, Kaufen/Verkaufen bleibt währenddessen über die normale Event-Delegation auf `#depotStocks` möglich (kein Re-Render blockiert Interaktion). `depotTrends` merkt sich pro Aktie die letzte Richtung (`up`/`down`) für die kurze Flash-Animation im Preis. „⏸ Pausieren“ oder Verlassen der Ansicht über `.back-btn` ruft `stopDepotLive()` auf, das den Timer beendet — sonst würde er unsichtbar im Hintergrund weiterlaufen. Beim Zurücksetzen des Depots wird der Timer ebenfalls gestoppt.
 
 **PWA (Progressive Web App):** `manifest.json` (Name, Icons, `display: standalone`, Theme-Farbe) + `sw.js` (Service Worker) machen die App installierbar ("Zum Home-Bildschirm hinzufügen"/"App installieren") und offline-fähig. Der Service Worker cached die App-Shell (`index.html`, `style.css`, `script.js`, Icons) beim ersten Laden cache-first mit Netzwerk-Fallback (siehe `sw.js`), registriert wird er ganz am Ende von `script.js` nach `window.onload`. Icons liegen unter `icons/icon-192.png` und `icons/icon-512.png` (plus `apple-touch-icon.png` für iOS und `favicon.png`) — alle aus einer einzigen 512×512-Canvas-Zeichnung (Gradient + 📈-Emoji) per `sips` auf die jeweilige Größe herunterskaliert, da auf der Maschine keine Bildbearbeitungstools (ImageMagick/Pillow) installiert sind. Das ist noch keine echte App-Store-Veröffentlichung, nur der PWA-Zwischenschritt dahin (siehe README).
+
+Die Schriftart "Outfit" wurde bewusst von Google Fonts auf lokal gehostet umgestellt (`fonts/outfit-variable.woff2`, eingebunden über `@font-face` in `style.css`): Das dynamische Nachladen von Google Fonts überträgt beim Seitenaufruf die IP-Adresse des Besuchers an Google (USA) — das gilt in Deutschland als DSGVO-Risiko (siehe u. a. LG München I, 2022) und wurde vor dem geplanten Live-Start entfernt. Die Datei ist eine Variable-Font-Version, die alle Schriftschnitte (400–800) in einer einzigen ~32 KB großen Datei abdeckt.
 
 ## Achtung: lokaler Test-Server cached script.js
 
