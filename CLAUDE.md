@@ -33,7 +33,9 @@ Drei Dateien, jede mit klarer Verantwortung:
 
 Achtung: `.result-panel` hat eine EIGENE Animation (`resultPopIn`) statt der `popIn`-Keyframe vom `.banner` — `popIn` enthält `translate(-50%,-50%)`, was nur für das absolut-positionierte, zentrierte Banner Sinn ergibt. Eine geteilte Animation zwischen beiden hatte das Ergebnis-Panel in die obere linke Ecke verschoben.
 
-**Musterdepot (`#depot-view`):** einfache Paper-Trading-Simulation. Startkapital `DEPOT_START_CASH` (10.000 €) plus vier fiktive Aktien (`DEPOT_STOCKS_DEFAULT`). „Kaufen“ investiert einen festen Betrag (`DEPOT_BUY_AMOUNT`, 500 €) zum aktuellen Kurs, „Verkaufen“ löst die komplette Position auf. „Kurse aktualisieren“ wendet einen Random-Walk-Schritt (`gaussianRandom()`, wiederverwendet aus der Spiellogik) auf alle Kurse an. Der komplette Depot-Zustand (Cash, Kurse, Positionen) wird als JSON unter `localStorage`-Key `boersenspiel_depot` persistiert, siehe `loadDepot()`/`saveDepot()`.
+**Musterdepot (`#depot-view`):** einfache Paper-Trading-Simulation. Startkapital `DEPOT_START_CASH` (10.000 €) plus vier fiktive Aktien (`DEPOT_STOCKS_DEFAULT`). „Kaufen“ investiert einen festen Betrag (`DEPOT_BUY_AMOUNT`, 500 €) zum aktuellen Kurs, „Verkaufen“ löst die komplette Position auf. Der komplette Depot-Zustand (Cash, Kurse, Positionen) wird als JSON unter `localStorage`-Key `boersenspiel_depot` persistiert, siehe `loadDepot()`/`saveDepot()`.
+
+**Live-Modus im Depot:** „▶️ Simulation starten“ (`depotToggle`) startet `setInterval(tickDepotPrices, DEPOT_TICK_MS)` (1800ms) — Kurse bewegen sich automatisch per Random Walk, Kaufen/Verkaufen bleibt währenddessen über die normale Event-Delegation auf `#depotStocks` möglich (kein Re-Render blockiert Interaktion). `depotTrends` merkt sich pro Aktie die letzte Richtung (`up`/`down`) für die kurze Flash-Animation im Preis. „⏸ Pausieren“ oder Verlassen der Ansicht über `.back-btn` ruft `stopDepotLive()` auf, das den Timer beendet — sonst würde er unsichtbar im Hintergrund weiterlaufen. Beim Zurücksetzen des Depots wird der Timer ebenfalls gestoppt.
 
 ## Achtung: lokaler Test-Server cached script.js
 

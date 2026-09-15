@@ -8,8 +8,10 @@ document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
 });
 document.querySelectorAll('.back-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    btn.closest('.view').classList.add('hidden');
+    const view = btn.closest('.view');
+    view.classList.add('hidden');
     menu.classList.remove('hidden');
+    if (view.id === 'depot-view') stopDepotLive();
   });
 });
 
@@ -272,13 +274,16 @@ function renderDepot() {
   depot.stocks.forEach(stock => {
     const shares = depot.holdings[stock.id] || 0;
     const value = shares * stock.price;
+    const trend = depotTrends[stock.id];
+    const trendClass = trend === 'up' ? 'flash-up' : trend === 'down' ? 'flash-down' : '';
+    const trendArrow = trend === 'up' ? ' ▲' : trend === 'down' ? ' ▼' : '';
 
     const li = document.createElement('li');
     li.className = 'stock-row';
     li.innerHTML = `
       <div class="stock-info">
         <span class="stock-name">${stock.name}</span>
-        <span class="stock-price">${formatEuro(stock.price)} je Anteil</span>
+        <span class="stock-price ${trendClass}">${formatEuro(stock.price)} je Anteil${trendArrow}</span>
         ${shares > 0 ? `<span class="stock-position">${shares.toFixed(2)} Anteile · ${formatEuro(value)}</span>` : ''}
       </div>
       <div class="stock-actions">
@@ -310,23 +315,57 @@ document.getElementById('depotStocks').addEventListener('click', (e) => {
   renderDepot();
 });
 
-document.getElementById('depotRefresh').addEventListener('click', () => {
+let depotTrends = {};
+let depotLiveTimer = null;
+const DEPOT_TICK_MS = 1800;
+
+function tickDepotPrices() {
   depot.stocks.forEach(stock => {
+    const oldPrice = stock.price;
     const volatility = 0.03;
     const shock = gaussianRandom() * volatility;
     stock.price = Math.max(1, stock.price * (1 + shock));
+    depotTrends[stock.id] = stock.price > oldPrice ? 'up' : stock.price < oldPrice ? 'down' : null;
   });
   saveDepot();
   renderDepot();
+}
+
+function startDepotLive() {
+  if (depotLiveTimer) return;
+  tickDepotPrices();
+  depotLiveTimer = setInterval(tickDepotPrices, DEPOT_TICK_MS);
+  const toggleBtn = document.getElementById('depotToggle');
+  toggleBtn.textContent = '⏸ Pausieren';
+  toggleBtn.classList.remove('start');
+  toggleBtn.classList.add('stop');
+  document.getElementById('depotLiveHint').classList.remove('hidden');
+}
+
+function stopDepotLive() {
+  if (!depotLiveTimer) return;
+  clearInterval(depotLiveTimer);
+  depotLiveTimer = null;
+  const toggleBtn = document.getElementById('depotToggle');
+  toggleBtn.textContent = '▶️ Simulation starten';
+  toggleBtn.classList.remove('stop');
+  toggleBtn.classList.add('start');
+  document.getElementById('depotLiveHint').classList.add('hidden');
+}
+
+document.getElementById('depotToggle').addEventListener('click', () => {
+  if (depotLiveTimer) stopDepotLive(); else startDepotLive();
 });
 
 document.getElementById('depotReset').addEventListener('click', () => {
   if (!confirm('Depot wirklich zurücksetzen? Dein virtuelles Guthaben und alle Positionen gehen verloren.')) return;
+  stopDepotLive();
   depot = {
     cash: DEPOT_START_CASH,
     stocks: DEPOT_STOCKS_DEFAULT.map(s => ({ ...s })),
     holdings: {},
   };
+  depotTrends = {};
   saveDepot();
   renderDepot();
 });
