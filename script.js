@@ -1,3 +1,17 @@
+const menu = document.getElementById('menu');
+document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    menu.classList.add('hidden');
+    document.getElementById(btn.dataset.view).classList.remove('hidden');
+  });
+});
+document.querySelectorAll('.back-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.view').classList.add('hidden');
+    menu.classList.remove('hidden');
+  });
+});
+
 const canvas = document.getElementById('chart');
 const ctx = canvas.getContext('2d');
 const W = canvas.width;

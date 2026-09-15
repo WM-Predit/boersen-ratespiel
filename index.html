@@ -13,25 +13,67 @@
       <p class="subtitle">Simulierter Kursverlauf. Geht es als Nächstes rauf oder runter?</p>
     </header>
 
-    <div class="stats">
-      <div class="stat"><span class="label">Runde</span><span id="round" class="value">1</span></div>
-      <div class="stat"><span class="label">Punkte</span><span id="score" class="value">0</span></div>
-      <div class="stat"><span class="label">Serie</span><span id="streak" class="value">0</span></div>
-      <div class="stat"><span class="label">Bestserie</span><span id="best" class="value">0</span></div>
-    </div>
+    <nav id="menu" class="menu">
+      <button class="menu-item" data-view="news-view">
+        <span class="menu-icon">📰</span>
+        <span class="menu-label">News</span>
+      </button>
+      <button class="menu-item" data-view="game-view">
+        <span class="menu-icon">📈📉</span>
+        <span class="menu-label">Rauf oder Runter</span>
+      </button>
+      <button class="menu-item" disabled>
+        <span class="menu-icon">🔒</span>
+        <span class="menu-label">Weitere Spiele (bald)</span>
+      </button>
+    </nav>
 
-    <div class="chart-wrap">
-      <canvas id="chart" width="800" height="360"></canvas>
-      <div id="banner" class="banner hidden"></div>
-    </div>
+    <section id="news-view" class="view hidden">
+      <button class="back-btn">← Zurück</button>
 
-    <div class="controls">
-      <button id="btnUp" class="btn up">📈 Rauf</button>
-      <button id="btnDown" class="btn down">📉 Runter</button>
-      <button id="btnNext" class="btn next hidden">Nächste Runde →</button>
-    </div>
+      <div class="news">
+        <h2>📰 Markt-News</h2>
+        <ul class="news-list">
+          <li>
+            <span class="news-headline">DAX unter Druck</span>
+            <span class="news-desc">Steigende Ölpreise belasten die Märkte, der DAX hat zuletzt deutlich nachgegeben.</span>
+          </li>
+          <li>
+            <span class="news-headline">BASF plant Börsengang der Agrarsparte</span>
+            <span class="news-desc">Das Agrargeschäft soll 2027 an die Frankfurter Börse gebracht werden — mögliche Bewertung: 20–30 Mrd. Euro.</span>
+          </li>
+          <li>
+            <span class="news-headline">Sartorius im Plus</span>
+            <span class="news-desc">Die Vorzugsaktie von Sartorius legte deutlich um +4,36% zu.</span>
+          </li>
+        </ul>
+        <p class="news-note">Kurz zusammengefasst, damit du nicht alles selbst durchlesen musst. Keine Anlageberatung.</p>
+      </div>
+    </section>
 
-    <p class="hint">Hinweis: Die Kursverläufe sind zufällig simuliert (kein echtes Marktdaten-Feed) — nur zum Üben deines Gefühls für Trends, Volatilität und Rauschen.</p>
+    <section id="game-view" class="view hidden">
+      <button class="back-btn">← Zurück</button>
+
+      <div class="stats">
+        <div class="stat"><span class="label">Runde</span><span id="round" class="value">1</span></div>
+        <div class="stat"><span class="label">Punkte</span><span id="score" class="value">0</span></div>
+        <div class="stat"><span class="label">Serie</span><span id="streak" class="value">0</span></div>
+        <div class="stat"><span class="label">Bestserie</span><span id="best" class="value">0</span></div>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="chart" width="800" height="360"></canvas>
+        <div id="banner" class="banner hidden"></div>
+      </div>
+
+      <div class="controls">
+        <button id="btnUp" class="btn up">📈 Rauf</button>
+        <button id="btnDown" class="btn down">📉 Runter</button>
+        <button id="btnNext" class="btn next hidden">Nächste Runde →</button>
+      </div>
+
+      <p class="hint">Hinweis: Die Kursverläufe sind zufällig simuliert (kein echtes Marktdaten-Feed) — nur zum Üben deines Gefühls für Trends, Volatilität und Rauschen.</p>
+    </section>
   </div>
   <script src="script.js"></script>
 </body>
