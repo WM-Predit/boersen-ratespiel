@@ -3,6 +3,7 @@ document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
   btn.addEventListener('click', () => {
     menu.classList.add('hidden');
     document.getElementById(btn.dataset.view).classList.remove('hidden');
+    if (btn.dataset.view === 'learn-view') resetLearnView();
   });
 });
 document.querySelectorAll('.back-btn').forEach(btn => {
@@ -331,3 +332,200 @@ document.getElementById('depotReset').addEventListener('click', () => {
 });
 
 renderDepot();
+
+// --- Lernen: Quiz ---
+
+const LEARN_BEST_KEY = 'boersenspiel_learn_best';
+const QUIZ_START_LIVES = 3;
+
+const LEVELS = [
+  { id: 'leicht', name: 'Leicht', icon: '🌱', points: 10, desc: 'Die Grundlagen' },
+  { id: 'mittel', name: 'Mittel', icon: '⚡', points: 20, desc: 'Für Fortgeschrittene' },
+  { id: 'schwer', name: 'Schwer', icon: '🔥', points: 30, desc: 'Echte Profi-Fragen' },
+];
+
+const QUIZ_DATA = {
+  leicht: [
+    { q: 'Was ist eine Aktie?', options: ['Ein Anteil an einem Unternehmen', 'Ein Kredit an den Staat', 'Eine Versicherung gegen Kursverluste'], correct: 0, explain: 'Eine Aktie ist ein Anteilsschein — du wirst Miteigentümer des Unternehmens.' },
+    { q: 'Was bedeutet "Diversifikation"?', options: ['Alles Geld in eine Aktie stecken', 'Geld auf mehrere Anlagen verteilen', 'Geld nur in bar halten'], correct: 1, explain: 'Streuung über mehrere Anlagen reduziert das Risiko einzelner Rückschläge.' },
+    { q: 'Was ist ein ETF?', options: ['Ein börsengehandelter Fonds, der einen Index nachbildet', 'Eine Kryptowährung', 'Ein Sparbuch der Bank'], correct: 0, explain: 'ETF = Exchange Traded Fund. Er bündelt viele Aktien in einem Produkt.' },
+    { q: 'Was ist der DAX?', options: ['Eine deutsche Bank', 'Der wichtigste deutsche Aktienindex', 'Eine Steuer auf Aktiengewinne'], correct: 1, explain: 'Der DAX bildet die größten deutschen Unternehmen an der Börse ab.' },
+    { q: 'Was passiert beim Zinseszins?', options: ['Das Geld bleibt immer gleich', 'Zinsen erwirtschaften wieder Zinsen', 'Das Geld verliert automatisch an Wert'], correct: 1, explain: 'Zinseszins lässt dein Vermögen umso stärker wachsen, je länger du investiert bleibst.' },
+  ],
+  mittel: [
+    { q: 'Was ist Volatilität?', options: ['Die Dividendenhöhe', 'Das Ausmaß der Kursschwankungen', 'Die Anzahl der Aktionäre'], correct: 1, explain: 'Volatilität beschreibt, wie stark ein Kurs schwankt.' },
+    { q: 'Was ist eine Dividende?', options: ['Eine Gewinnbeteiligung für Aktionäre', 'Eine Strafe für den Verkauf', 'Der Kaufpreis einer Aktie'], correct: 0, explain: 'Unternehmen schütten damit einen Teil ihres Gewinns an Aktionäre aus.' },
+    { q: 'Was bedeutet "Bärenmarkt"?', options: ['Ein Markt mit steigenden Kursen', 'Ein Markt mit fallenden Kursen über längere Zeit', 'Ein Markt nur für Rohstoffe'], correct: 1, explain: 'Ein Bärenmarkt beschreibt eine anhaltende Abwärtsphase.' },
+    { q: 'Warum hilft ein langer Anlagehorizont?', options: ['Kurzfristige Schwankungen gleichen sich eher aus', 'Man zahlt automatisch weniger Steuern', 'Aktien werden mit der Zeit garantiert günstiger'], correct: 0, explain: 'Je länger der Zeitraum, desto eher gleichen sich kurzfristige Ausschläge aus.' },
+    { q: 'Was unterscheidet Sparen von Investieren?', options: ['Kein Unterschied', 'Sparen ist risikofrei, Investieren trägt Risiko für höhere Renditechancen', 'Investieren ist immer sicherer'], correct: 1, explain: 'Investieren bedeutet, für die Chance auf höhere Rendite Risiko einzugehen.' },
+  ],
+  schwer: [
+    { q: 'Was misst die Sharpe Ratio?', options: ['Rendite im Verhältnis zum eingegangenen Risiko', 'Die Dividendenrendite', 'Die Marktkapitalisierung'], correct: 0, explain: 'Die Sharpe Ratio zeigt, wie viel Rendite pro Risikoeinheit erzielt wurde.' },
+    { q: 'Was ist ein Rebalancing?', options: ['Das Zurücksetzen des Depots auf die Ursprungsgewichtung', 'Der Verkauf aller Positionen', 'Eine Steuerstrategie'], correct: 0, explain: 'Rebalancing stellt die ursprünglich geplante Aufteilung des Depots wieder her.' },
+    { q: 'Was zeigt das Kurs-Gewinn-Verhältnis (KGV)?', options: ['Verhältnis von Aktienkurs zu Gewinn je Aktie', 'Verhältnis von Umsatz zu Mitarbeitern', 'Verhältnis von Dividende zu Kurs'], correct: 0, explain: 'Das KGV setzt den Aktienkurs ins Verhältnis zum Gewinn je Aktie.' },
+    { q: 'Was ist ein "Blue Chip"?', options: ['Eine besonders volatile Kleinstaktie', 'Eine etablierte, finanzstarke Standardaktie', 'Ein spezieller Anleihe-Typ'], correct: 1, explain: 'Blue Chips sind große, etablierte Unternehmen mit stabiler Marktstellung.' },
+    { q: 'Was besagt die Effizienzmarkthypothese?', options: ['Märkte reagieren nie auf neue Informationen', 'Alle verfügbaren Informationen spiegeln sich bereits im Kurs wider', 'Nur institutionelle Anleger können den Markt schlagen'], correct: 1, explain: 'Sie besagt, dass Kurse verfügbare Informationen bereits einpreisen.' },
+  ],
+};
+
+function loadLearnBest() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LEARN_BEST_KEY));
+    if (saved) return saved;
+  } catch (e) {}
+  return {};
+}
+
+let learnBest = loadLearnBest();
+let quiz = null;
+
+function resetLearnView() {
+  document.getElementById('learnQuiz').classList.add('hidden');
+  document.getElementById('learnResult').classList.add('hidden');
+  document.getElementById('learnLevels').classList.remove('hidden');
+  renderLevels();
+}
+
+function renderLevels() {
+  const list = document.getElementById('learnLevelList');
+  list.innerHTML = '';
+  LEVELS.forEach(level => {
+    const total = QUIZ_DATA[level.id].length;
+    const best = learnBest[level.id] || 0;
+    const li = document.createElement('li');
+    li.className = 'level-row';
+    li.innerHTML = `
+      <button class="menu-item level-btn" data-level="${level.id}">
+        <span class="menu-icon">${level.icon}</span>
+        <span class="menu-text">
+          <span class="menu-label">${level.name}</span>
+          <span class="menu-sub">${level.desc} · ${total} Fragen · ${level.points} Punkte/Antwort</span>
+        </span>
+        <span class="menu-arrow">${best > 0 ? `🏆 ${best}` : '→'}</span>
+      </button>
+    `;
+    list.appendChild(li);
+  });
+  list.querySelectorAll('.level-btn').forEach(btn => {
+    btn.addEventListener('click', () => startQuiz(btn.dataset.level));
+  });
+}
+
+function startQuiz(levelId) {
+  quiz = {
+    levelId,
+    questions: QUIZ_DATA[levelId],
+    index: 0,
+    score: 0,
+    lives: QUIZ_START_LIVES,
+    answered: false,
+  };
+  document.getElementById('learnLevels').classList.add('hidden');
+  document.getElementById('learnResult').classList.add('hidden');
+  document.getElementById('learnQuiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const level = LEVELS.find(l => l.id === quiz.levelId);
+  const question = quiz.questions[quiz.index];
+  quiz.answered = false;
+
+  document.getElementById('quizProgress').textContent = `${quiz.index + 1}/${quiz.questions.length}`;
+  document.getElementById('quizScore').textContent = quiz.score;
+  document.getElementById('quizLives').textContent = '❤️'.repeat(quiz.lives) + '🖤'.repeat(QUIZ_START_LIVES - quiz.lives);
+  document.getElementById('quizProgressBar').style.width = (quiz.index / quiz.questions.length * 100) + '%';
+
+  document.getElementById('quizQuestion').textContent = question.q;
+  document.getElementById('quizExplanation').classList.add('hidden');
+  document.getElementById('quizNext').classList.add('hidden');
+
+  const answersEl = document.getElementById('quizAnswers');
+  answersEl.innerHTML = '';
+  question.options.forEach((option, i) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = option;
+    btn.dataset.index = i;
+    btn.addEventListener('click', () => selectAnswer(i));
+    li.appendChild(btn);
+    answersEl.appendChild(li);
+  });
+}
+
+function selectAnswer(i) {
+  if (quiz.answered) return;
+  quiz.answered = true;
+
+  const level = LEVELS.find(l => l.id === quiz.levelId);
+  const question = quiz.questions[quiz.index];
+  const correct = i === question.correct;
+
+  document.querySelectorAll('#quizAnswers .answer-btn').forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === question.correct) btn.classList.add('correct');
+    else if (idx === i) btn.classList.add('wrong');
+  });
+
+  if (correct) {
+    quiz.score += level.points;
+    burstConfetti();
+  } else {
+    quiz.lives--;
+  }
+
+  document.getElementById('quizScore').textContent = quiz.score;
+  bump(document.getElementById('quizScore'));
+  document.getElementById('quizLives').textContent = '❤️'.repeat(Math.max(quiz.lives, 0)) + '🖤'.repeat(QUIZ_START_LIVES - Math.max(quiz.lives, 0));
+
+  const explanationEl = document.getElementById('quizExplanation');
+  explanationEl.textContent = (correct ? '✅ Richtig! ' : '❌ Leider falsch. ') + question.explain;
+  explanationEl.classList.remove('hidden');
+  explanationEl.classList.add(correct ? 'correct' : 'wrong');
+
+  const nextBtn = document.getElementById('quizNext');
+  const isLastQuestion = quiz.index >= quiz.questions.length - 1;
+  const isGameOver = quiz.lives <= 0;
+  nextBtn.textContent = (isLastQuestion || isGameOver) ? 'Ergebnis ansehen →' : 'Weiter →';
+  nextBtn.classList.remove('hidden');
+}
+
+document.getElementById('quizNext').addEventListener('click', () => {
+  const isLastQuestion = quiz.index >= quiz.questions.length - 1;
+  const isGameOver = quiz.lives <= 0;
+  if (isLastQuestion || isGameOver) {
+    finishQuiz();
+  } else {
+    quiz.index++;
+    document.getElementById('quizExplanation').classList.remove('correct', 'wrong');
+    renderQuestion();
+  }
+});
+
+function finishQuiz() {
+  const level = LEVELS.find(l => l.id === quiz.levelId);
+  const total = quiz.questions.length;
+  const maxScore = total * level.points;
+  const gameOver = quiz.lives <= 0;
+  const perfect = quiz.score === maxScore;
+
+  if (!learnBest[quiz.levelId] || quiz.score > learnBest[quiz.levelId]) {
+    learnBest[quiz.levelId] = quiz.score;
+    localStorage.setItem(LEARN_BEST_KEY, JSON.stringify(learnBest));
+  }
+
+  document.getElementById('learnQuiz').classList.add('hidden');
+  document.getElementById('learnResult').classList.remove('hidden');
+
+  document.getElementById('resultEmoji').textContent = gameOver ? '💔' : perfect ? '🏆' : '🎉';
+  document.getElementById('resultTitle').textContent = gameOver ? 'Game Over' : perfect ? 'Perfekt!' : 'Geschafft!';
+  document.getElementById('resultSummary').textContent =
+    `${quiz.score} von ${maxScore} Punkten · Level "${level.name}"` +
+    (gameOver ? ' — keine Leben mehr übrig. Versuch es nochmal!' : perfect ? ' — alle Fragen richtig beantwortet!' : '.');
+
+  if (perfect) burstConfetti();
+}
+
+document.getElementById('resultRetry').addEventListener('click', () => startQuiz(quiz.levelId));
+document.getElementById('resultBack').addEventListener('click', resetLearnView);

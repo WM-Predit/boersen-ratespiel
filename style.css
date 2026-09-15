@@ -483,6 +483,112 @@ canvas {
 
 .depot-reset-hint { margin-top: 14px; }
 
+/* Lernen: Quiz */
+
+.quiz-intro { margin: 0 0 16px; text-align: left; }
+
+.level-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.level-row .level-btn { width: 100%; }
+
+.quiz-progress-track {
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.quiz-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-2), var(--purple-2));
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.quiz-panel h2 { font-size: 1.15rem; line-height: 1.4; }
+
+.answer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.answer-btn {
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 13px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+.answer-btn:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.09);
+  transform: translateY(-1px);
+}
+
+.answer-btn:disabled { cursor: default; }
+
+.answer-btn.correct {
+  background: rgba(52, 211, 153, 0.2);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.answer-btn.wrong {
+  background: rgba(251, 113, 133, 0.2);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.quiz-explanation {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.quiz-explanation.correct { color: var(--green); }
+.quiz-explanation.wrong { color: var(--red); }
+
+#quizNext { margin-top: 16px; }
+
+.result-panel {
+  text-align: center;
+  padding: 32px 20px;
+  animation: resultPopIn 0.4s cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes resultPopIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.result-emoji { font-size: 3rem; margin-bottom: 8px; }
+
+.result-panel h2 { margin: 0 0 8px; font-size: 1.4rem; }
+
+.result-panel .controls { margin-top: 20px; margin-bottom: 0; }
+
 /* Confetti */
 
 .confetti-piece {
