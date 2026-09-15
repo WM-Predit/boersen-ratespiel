@@ -632,6 +632,46 @@ canvas {
 
 .result-panel .controls { margin-top: 20px; margin-bottom: 0; }
 
+/* Confirm modal */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(6, 7, 13, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeInUp 0.2s ease both;
+}
+
+.modal-overlay.hidden { display: none !important; }
+
+.modal-panel {
+  width: 100%;
+  max-width: 360px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  padding: 22px 20px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: resultPopIn 0.25s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.modal-panel p {
+  margin: 0 0 18px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.modal-panel .controls { margin: 0; }
+
 /* Confetti */
 
 .confetti-piece {
