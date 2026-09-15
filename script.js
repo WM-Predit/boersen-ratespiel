@@ -80,7 +80,7 @@ function draw(visibleCount, opts = {}) {
 
   ctx.lineWidth = 2;
 
-  ctx.strokeStyle = '#4d7cff';
+  ctx.strokeStyle = '#60a5fa';
   ctx.beginPath();
   for (let i = 0; i < historyEnd; i++) {
     const [x, y] = toXY(i, series[i]);
@@ -108,7 +108,7 @@ function draw(visibleCount, opts = {}) {
   ctx.setLineDash([]);
 
   const [lx, ly] = toXY(visibleCount - 1, series[visibleCount - 1]);
-  ctx.fillStyle = visibleCount > HISTORY_POINTS ? (opts.color || '#8b95ab') : '#4d7cff';
+  ctx.fillStyle = visibleCount > HISTORY_POINTS ? (opts.color || '#8b95ab') : '#60a5fa';
   ctx.beginPath();
   ctx.arc(lx, ly, 4, 0, Math.PI * 2);
   ctx.fill();
@@ -136,7 +136,7 @@ function revealAndScore(guessUp) {
   const actuallyUp = endPrice > startPrice;
   const pctChange = ((endPrice - startPrice) / startPrice) * 100;
   const correct = guessUp === actuallyUp;
-  const revealColor = actuallyUp ? '#2ecc71' : '#ff5c5c';
+  const revealColor = actuallyUp ? '#34d399' : '#fb7185';
 
   let frame = HISTORY_POINTS;
   const timer = setInterval(() => {
@@ -149,6 +149,31 @@ function revealAndScore(guessUp) {
   }, 40);
 }
 
+const CONFETTI_COLORS = ['#34d399', '#60a5fa', '#a78bfa', '#fb7185', '#facc15'];
+
+function burstConfetti() {
+  const count = 28;
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const size = 6 + Math.random() * 6;
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.width = size + 'px';
+    piece.style.height = size * 0.4 + 'px';
+    piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    piece.style.animationDuration = (1.6 + Math.random() * 1.2) + 's';
+    piece.style.animationDelay = (Math.random() * 0.15) + 's';
+    document.body.appendChild(piece);
+    piece.addEventListener('animationend', () => piece.remove());
+  }
+}
+
+function bump(el) {
+  el.classList.remove('bump');
+  void el.offsetWidth;
+  el.classList.add('bump');
+}
+
 function showResult(correct, pctChange) {
   if (correct) {
     score++;
@@ -157,6 +182,7 @@ function showResult(correct, pctChange) {
       best = streak;
       localStorage.setItem('boersenspiel_best', String(best));
     }
+    burstConfetti();
   } else {
     streak = 0;
   }
@@ -164,6 +190,7 @@ function showResult(correct, pctChange) {
   scoreEl.textContent = score;
   streakEl.textContent = streak;
   bestEl.textContent = best;
+  [scoreEl, streakEl, bestEl].forEach(bump);
 
   const sign = pctChange >= 0 ? '+' : '';
   banner.textContent = `${correct ? '✅ Richtig!' : '❌ Falsch.'} ${sign}${pctChange.toFixed(1)}%`;
