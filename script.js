@@ -357,17 +357,41 @@ document.getElementById('depotToggle').addEventListener('click', () => {
   if (depotLiveTimer) stopDepotLive(); else startDepotLive();
 });
 
+function showConfirm(message, onConfirm) {
+  const overlay = document.getElementById('confirmModal');
+  document.getElementById('confirmModalText').textContent = message;
+  overlay.classList.remove('hidden');
+
+  const okBtn = document.getElementById('confirmModalOk');
+  const cancelBtn = document.getElementById('confirmModalCancel');
+
+  function cleanup() {
+    overlay.classList.add('hidden');
+    okBtn.removeEventListener('click', onOk);
+    cancelBtn.removeEventListener('click', onCancel);
+    overlay.removeEventListener('click', onOverlayClick);
+  }
+  function onOk() { cleanup(); onConfirm(); }
+  function onCancel() { cleanup(); }
+  function onOverlayClick(e) { if (e.target === overlay) cleanup(); }
+
+  okBtn.addEventListener('click', onOk);
+  cancelBtn.addEventListener('click', onCancel);
+  overlay.addEventListener('click', onOverlayClick);
+}
+
 document.getElementById('depotReset').addEventListener('click', () => {
-  if (!confirm('Depot wirklich zurücksetzen? Dein virtuelles Guthaben und alle Positionen gehen verloren.')) return;
-  stopDepotLive();
-  depot = {
-    cash: DEPOT_START_CASH,
-    stocks: DEPOT_STOCKS_DEFAULT.map(s => ({ ...s })),
-    holdings: {},
-  };
-  depotTrends = {};
-  saveDepot();
-  renderDepot();
+  showConfirm('Depot wirklich zurücksetzen? Dein virtuelles Guthaben und alle Positionen gehen verloren.', () => {
+    stopDepotLive();
+    depot = {
+      cash: DEPOT_START_CASH,
+      stocks: DEPOT_STOCKS_DEFAULT.map(s => ({ ...s })),
+      holdings: {},
+    };
+    depotTrends = {};
+    saveDepot();
+    renderDepot();
+  });
 });
 
 renderDepot();
