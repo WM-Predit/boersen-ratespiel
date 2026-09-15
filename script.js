@@ -4,6 +4,7 @@ document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
     menu.classList.add('hidden');
     document.getElementById(btn.dataset.view).classList.remove('hidden');
     if (btn.dataset.view === 'learn-view') resetLearnView();
+    if (btn.dataset.view === 'game-view') newRound();
   });
 });
 document.querySelectorAll('.back-btn').forEach(btn => {
@@ -12,6 +13,7 @@ document.querySelectorAll('.back-btn').forEach(btn => {
     view.classList.add('hidden');
     menu.classList.remove('hidden');
     if (view.id === 'depot-view') stopDepotLive();
+    if (view.id === 'game-view') clearRoundTimer();
   });
 });
 
@@ -32,6 +34,13 @@ const roundEl = document.getElementById('round');
 const scoreEl = document.getElementById('score');
 const streakEl = document.getElementById('streak');
 const bestEl = document.getElementById('best');
+const multiplierBadge = document.getElementById('multiplierBadge');
+const roundTimerBar = document.getElementById('roundTimerBar');
+const streakToast = document.getElementById('streakToast');
+
+const ROUND_TIME_MS = 6000;
+const BASE_POINTS = 10;
+const STREAK_MILESTONES = [3, 5, 10];
 
 let round = 1;
 let score = 0;
@@ -41,6 +50,58 @@ bestEl.textContent = best;
 
 let series = [];
 let guessing = true;
+let roundTimer = null;
+let roundTimeLeft = ROUND_TIME_MS;
+
+function getMultiplier(s) {
+  if (s >= 10) return 3;
+  if (s >= 5) return 2;
+  if (s >= 3) return 1.5;
+  return 1;
+}
+
+function updateMultiplierBadge() {
+  const mult = getMultiplier(streak);
+  if (mult > 1) {
+    multiplierBadge.textContent = '🔥 ×' + mult;
+    multiplierBadge.classList.remove('hidden');
+  } else {
+    multiplierBadge.classList.add('hidden');
+  }
+}
+
+function startRoundTimer() {
+  clearRoundTimer();
+  roundTimeLeft = ROUND_TIME_MS;
+  roundTimerBar.style.width = '100%';
+  roundTimerBar.classList.remove('urgent');
+  roundTimer = setInterval(() => {
+    roundTimeLeft -= 100;
+    const pct = Math.max(0, roundTimeLeft / ROUND_TIME_MS) * 100;
+    roundTimerBar.style.width = pct + '%';
+    roundTimerBar.classList.toggle('urgent', pct < 30);
+    if (roundTimeLeft <= 0) {
+      clearRoundTimer();
+      if (guessing) revealAndScore(null, true);
+    }
+  }, 100);
+}
+
+function clearRoundTimer() {
+  if (roundTimer) {
+    clearInterval(roundTimer);
+    roundTimer = null;
+  }
+}
+
+function showStreakToast(streakCount, multiplier) {
+  streakToast.textContent = `🔥 ${streakCount}er Serie! Punkte ×${multiplier}`;
+  streakToast.classList.remove('hidden', 'pop');
+  void streakToast.offsetWidth;
+  streakToast.classList.add('pop');
+  clearTimeout(showStreakToast._timer);
+  showStreakToast._timer = setTimeout(() => streakToast.classList.add('hidden'), 1800);
+}
 
 function gaussianRandom() {
   let u = 0, v = 0;
@@ -81,8 +142,26 @@ function draw(visibleCount, opts = {}) {
     return [x, y];
   }
 
-  ctx.lineWidth = 2;
+  // Gradient-Fläche unter dem bisherigen Kursverlauf
+  const gradient = ctx.createLinearGradient(0, 0, 0, H);
+  gradient.addColorStop(0, 'rgba(96, 165, 250, 0.28)');
+  gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
+  ctx.beginPath();
+  for (let i = 0; i < historyEnd; i++) {
+    const [x, y] = toXY(i, series[i]);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.lineTo(toXY(historyEnd - 1, series[historyEnd - 1])[0], H);
+  ctx.lineTo(toXY(0, series[0])[0], H);
+  ctx.closePath();
+  ctx.fillStyle = gradient;
+  ctx.fill();
 
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+
+  ctx.shadowColor = 'rgba(96, 165, 250, 0.6)';
+  ctx.shadowBlur = 8;
   ctx.strokeStyle = '#60a5fa';
   ctx.beginPath();
   for (let i = 0; i < historyEnd; i++) {
@@ -90,15 +169,20 @@ function draw(visibleCount, opts = {}) {
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
   ctx.stroke();
+  ctx.shadowBlur = 0;
 
   if (visibleCount > HISTORY_POINTS) {
-    ctx.strokeStyle = opts.color || '#8b95ab';
+    const revealColor = opts.color || '#8b95ab';
+    ctx.shadowColor = revealColor;
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = revealColor;
     ctx.beginPath();
     for (let i = HISTORY_POINTS - 1; i < visibleCount; i++) {
       const [x, y] = toXY(i, series[i]);
       if (i === HISTORY_POINTS - 1) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke();
+    ctx.shadowBlur = 0;
   }
 
   const dividerX = (HISTORY_POINTS - 1) * xStep;
@@ -111,10 +195,14 @@ function draw(visibleCount, opts = {}) {
   ctx.setLineDash([]);
 
   const [lx, ly] = toXY(visibleCount - 1, series[visibleCount - 1]);
-  ctx.fillStyle = visibleCount > HISTORY_POINTS ? (opts.color || '#8b95ab') : '#60a5fa';
+  const dotColor = visibleCount > HISTORY_POINTS ? (opts.color || '#8b95ab') : '#60a5fa';
+  ctx.shadowColor = dotColor;
+  ctx.shadowBlur = 14;
+  ctx.fillStyle = dotColor;
   ctx.beginPath();
-  ctx.arc(lx, ly, 4, 0, Math.PI * 2);
+  ctx.arc(lx, ly, 5, 0, Math.PI * 2);
   ctx.fill();
+  ctx.shadowBlur = 0;
 }
 
 function newRound() {
@@ -126,10 +214,13 @@ function newRound() {
   btnUp.disabled = false;
   btnDown.disabled = false;
   roundEl.textContent = round;
+  updateMultiplierBadge();
   draw(HISTORY_POINTS);
+  startRoundTimer();
 }
 
-function revealAndScore(guessUp) {
+function revealAndScore(guessUp, timedOut = false) {
+  clearRoundTimer();
   guessing = false;
   btnUp.disabled = true;
   btnDown.disabled = true;
@@ -147,7 +238,7 @@ function revealAndScore(guessUp) {
     draw(frame, { color: revealColor });
     if (frame >= series.length) {
       clearInterval(timer);
-      showResult(correct, pctChange);
+      showResult(correct, pctChange, timedOut);
     }
   }, 40);
 }
@@ -177,26 +268,34 @@ function bump(el) {
   el.classList.add('bump');
 }
 
-function showResult(correct, pctChange) {
+function showResult(correct, pctChange, timedOut = false) {
+  let points = 0;
   if (correct) {
-    score++;
+    const multiplier = getMultiplier(streak);
+    points = Math.round(BASE_POINTS * multiplier);
+    score += points;
     streak++;
     if (streak > best) {
       best = streak;
       localStorage.setItem('boersenspiel_best', String(best));
     }
     burstConfetti();
+    if (STREAK_MILESTONES.includes(streak)) {
+      showStreakToast(streak, getMultiplier(streak));
+    }
   } else {
     streak = 0;
   }
 
+  updateMultiplierBadge();
   scoreEl.textContent = score;
   streakEl.textContent = streak;
   bestEl.textContent = best;
   [scoreEl, streakEl, bestEl].forEach(bump);
 
   const sign = pctChange >= 0 ? '+' : '';
-  banner.textContent = `${correct ? '✅ Richtig!' : '❌ Falsch.'} ${sign}${pctChange.toFixed(1)}%`;
+  const resultText = timedOut ? '⏰ Zeit abgelaufen!' : correct ? `✅ Richtig! +${points} Punkte` : '❌ Falsch.';
+  banner.textContent = `${resultText} ${sign}${pctChange.toFixed(1)}%`;
   banner.classList.remove('hidden');
   banner.classList.add(correct ? 'correct' : 'wrong');
 
@@ -209,8 +308,6 @@ btnNext.addEventListener('click', () => {
   round++;
   newRound();
 });
-
-newRound();
 
 // --- Musterdepot ---
 

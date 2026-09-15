@@ -23,9 +23,12 @@ Drei Dateien, jede mit klarer Verantwortung:
 **Spielablauf in `script.js`** (Section `#game-view`):
 
 1. `generateSeries()` erzeugt einen Kursverlauf als Random Walk mit Drift + Volatilität (Gaussian-verteilte Schocks über `gaussianRandom()`, Box-Muller-Transformation). Insgesamt `HISTORY_POINTS` (90) sichtbare Vergangenheitspunkte + `FUTURE_POINTS` (25) verdeckte Zukunftspunkte.
-2. `draw(visibleCount, opts)` rendert den Verlauf auf dem `<canvas>` per 2D-Context — Vergangenheit in Blau, aufgedeckte Zukunft farbig je nach Ergebnis (grün/rot), getrennt durch eine gestrichelte Linie bei `HISTORY_POINTS`.
-3. Klick auf „Rauf“/„Runter“ triggert `revealAndScore()`, das den Rest der Serie per `setInterval` (40ms/Frame) animiert aufdeckt und danach `showResult()` aufruft.
-4. `showResult()` wertet Treffer/Serie/Bestserie aus, ruft bei Treffer `burstConfetti()` auf. Die Bestserie (`best`) wird in `localStorage` unter dem Key `boersenspiel_best` persistiert.
+2. `draw(visibleCount, opts)` rendert den Verlauf auf dem `<canvas>` per 2D-Context — Gradient-Fläche + Glow unter/um die Linie, Vergangenheit in Blau, aufgedeckte Zukunft farbig je nach Ergebnis (grün/rot), getrennt durch eine gestrichelte Linie bei `HISTORY_POINTS`.
+3. `newRound()` startet zusätzlich `startRoundTimer()` — ein `ROUND_TIME_MS` (6s) Countdown mit visueller Leiste (`#roundTimerBar`). Läuft die Zeit ab, wird die Runde automatisch als falsch gewertet (`revealAndScore(null, true)` — `null` kann nie `=== true/false` sein, daher immer `correct === false`).
+4. Klick auf „Rauf“/„Runter“ triggert `revealAndScore()`, das den Timer stoppt und den Rest der Serie per `setInterval` (40ms/Frame) animiert aufdeckt, dann `showResult()` aufruft.
+5. `showResult()` wertet Treffer/Serie/Bestserie aus. Punkte pro Treffer = `BASE_POINTS` (10) × Multiplikator aus `getMultiplier(streak)` (1× / 1.5× ab Serie 3 / 2× ab Serie 5 / 3× ab Serie 10, angezeigt als Badge). Bei Erreichen einer Serie aus `STREAK_MILESTONES` erscheint ein kurzer Toast (`showStreakToast()`). Bei Treffer zusätzlich `burstConfetti()`. Die Bestserie (`best`) wird in `localStorage` unter dem Key `boersenspiel_best` persistiert.
+
+Wichtig: `newRound()`/der Rundentimer werden NICHT beim Laden der Seite gestartet, sondern erst wenn `#game-view` über das Menü geöffnet wird (`if (btn.dataset.view === 'game-view') newRound();` im Menü-Click-Handler oben in der Datei) — sonst würde der 6s-Timer schon unsichtbar im Hintergrund laufen, bevor der Nutzer das Spiel überhaupt sieht, und beim ersten Blick wäre die Runde eventuell schon durch Zeitablauf verloren. Verlassen der Ansicht über `.back-btn` stoppt den Timer über `clearRoundTimer()`.
 
 **News (`#news-view`):** statische, handkuratierte Liste (`.info-list` in `index.html`, gemeinsames `.panel`-Layout). Es gibt keine echten Marktdaten — nirgendwo in der App sind es Live-Feeds, alles ist simuliert bzw. manuell zusammengefasst (siehe README).
 
