@@ -233,6 +233,15 @@ h1 {
   margin-bottom: 18px;
 }
 
+@media (max-width: 480px) {
+  .stats {
+    flex-wrap: wrap;
+  }
+  .stats .stat {
+    flex: 1 1 calc(50% - 6px);
+  }
+}
+
 .stat {
   position: relative;
   flex: 1;
@@ -600,6 +609,50 @@ canvas {
 .news-feed li:nth-child(3) { animation-delay: 0.15s; }
 
 /* Musterdepot */
+
+.depot-hero {
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 22px 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+
+.depot-hero-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.depot-hero-value {
+  display: block;
+  font-size: 2.6rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0 10px;
+  line-height: 1.1;
+}
+
+.depot-hero-return {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.depot-substats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
 
 .depot-panel-head {
   display: flex;
