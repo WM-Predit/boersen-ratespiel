@@ -42,6 +42,14 @@
         </span>
         <span class="menu-arrow">→</span>
       </button>
+      <button class="menu-item accent-depot" data-view="depot-view">
+        <span class="menu-icon">💼</span>
+        <span class="menu-text">
+          <span class="menu-label">Musterdepot</span>
+          <span class="menu-sub">Virtuell investieren, ohne Risiko</span>
+        </span>
+        <span class="menu-arrow">→</span>
+      </button>
       <button class="menu-item" disabled>
         <span class="menu-icon">🔒</span>
         <span class="menu-text">
@@ -99,6 +107,28 @@
         </ul>
         <p class="panel-note">Kurze Grundlagen, keine Anlageberatung.</p>
       </div>
+    </section>
+
+    <section id="depot-view" class="view hidden">
+      <button class="back-btn">← Zurück</button>
+
+      <div class="stats">
+        <div class="stat"><span class="label">Kontostand</span><span id="depotCash" class="value">0 €</span></div>
+        <div class="stat"><span class="label">Depotwert</span><span id="depotHoldingsValue" class="value">0 €</span></div>
+        <div class="stat"><span class="label">Gesamt</span><span id="depotTotal" class="value">0 €</span></div>
+        <div class="stat"><span class="label">Rendite</span><span id="depotReturn" class="value">0 %</span></div>
+      </div>
+
+      <div class="panel depot-panel">
+        <div class="depot-panel-head">
+          <h2>💼 Musterdepot</h2>
+          <button id="depotRefresh" class="mini-btn">🔄 Kurse aktualisieren</button>
+        </div>
+        <ul id="depotStocks" class="stock-list"></ul>
+        <p class="panel-note">Virtuelles Geld, fiktive Kurse (Random Walk) — kein echtes Marktdaten-Feed, keine Anlageberatung.</p>
+      </div>
+
+      <p class="hint depot-reset-hint">Etwas verklickt? <button id="depotReset" class="link-btn">Depot zurücksetzen</button></p>
     </section>
 
     <section id="game-view" class="view hidden">
