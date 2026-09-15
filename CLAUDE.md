@@ -27,7 +27,11 @@ Drei Dateien, jede mit klarer Verantwortung:
 3. Klick auf „Rauf“/„Runter“ triggert `revealAndScore()`, das den Rest der Serie per `setInterval` (40ms/Frame) animiert aufdeckt und danach `showResult()` aufruft.
 4. `showResult()` wertet Treffer/Serie/Bestserie aus, ruft bei Treffer `burstConfetti()` auf. Die Bestserie (`best`) wird in `localStorage` unter dem Key `boersenspiel_best` persistiert.
 
-**News/Lernen (`#news-view`, `#learn-view`):** statische, handkuratierte Listen (`.info-list` in `index.html`, gemeinsames `.panel`-Layout). Es gibt keine echten Marktdaten — nirgendwo in der App sind es Live-Feeds, alles ist simuliert bzw. manuell zusammengefasst (siehe README).
+**News (`#news-view`):** statische, handkuratierte Liste (`.info-list` in `index.html`, gemeinsames `.panel`-Layout). Es gibt keine echten Marktdaten — nirgendwo in der App sind es Live-Feeds, alles ist simuliert bzw. manuell zusammengefasst (siehe README).
+
+**Lernen (`#learn-view`):** Multiple-Choice-Quiz mit drei Schwierigkeitsgraden (`LEVELS` in `script.js`: leicht/mittel/schwer, je 5 Fragen in `QUIZ_DATA`). Ablauf: Level-Auswahl (`#learnLevels`) → Quiz (`#learnQuiz`, 3 Leben, Punkte je nach Level, Fortschrittsbalken) → Ergebnis (`#learnResult`, mit Konfetti bei perfektem Lauf). `resetLearnView()` setzt die Ansicht beim erneuten Öffnen über das Menü immer auf die Level-Auswahl zurück, egal in welchem Quiz-Zustand man vorher war. Highscores pro Level werden unter `localStorage`-Key `boersenspiel_learn_best` persistiert.
+
+Achtung: `.result-panel` hat eine EIGENE Animation (`resultPopIn`) statt der `popIn`-Keyframe vom `.banner` — `popIn` enthält `translate(-50%,-50%)`, was nur für das absolut-positionierte, zentrierte Banner Sinn ergibt. Eine geteilte Animation zwischen beiden hatte das Ergebnis-Panel in die obere linke Ecke verschoben.
 
 **Musterdepot (`#depot-view`):** einfache Paper-Trading-Simulation. Startkapital `DEPOT_START_CASH` (10.000 €) plus vier fiktive Aktien (`DEPOT_STOCKS_DEFAULT`). „Kaufen“ investiert einen festen Betrag (`DEPOT_BUY_AMOUNT`, 500 €) zum aktuellen Kurs, „Verkaufen“ löst die komplette Position auf. „Kurse aktualisieren“ wendet einen Random-Walk-Schritt (`gaussianRandom()`, wiederverwendet aus der Spiellogik) auf alle Kurse an. Der komplette Depot-Zustand (Cash, Kurse, Positionen) wird als JSON unter `localStorage`-Key `boersenspiel_depot` persistiert, siehe `loadDepot()`/`saveDepot()`.
 

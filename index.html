@@ -85,27 +85,41 @@
     <section id="learn-view" class="view hidden">
       <button class="back-btn">← Zurück</button>
 
-      <div class="panel">
-        <h2>📚 Lernen</h2>
-        <ul class="info-list">
-          <li>
-            <span class="info-headline">Diversifikation</span>
-            <span class="info-desc">Nicht alles auf eine Aktie setzen: Wer Branchen und Länder mischt, den trifft ein einzelner Rückschlag weniger hart.</span>
-          </li>
-          <li>
-            <span class="info-headline">Zinseszins</span>
-            <span class="info-desc">Zinsen auf Zinsen — wer früh anfängt, profitiert am meisten. Zeit ist beim Investieren einer der wichtigsten Faktoren.</span>
-          </li>
-          <li>
-            <span class="info-headline">ETFs</span>
-            <span class="info-desc">Ein ETF bündelt viele Aktien in einem Produkt — so streust du dein Risiko, ohne jede Aktie einzeln auswählen zu müssen.</span>
-          </li>
-          <li>
-            <span class="info-headline">Volatilität</span>
-            <span class="info-desc">Kurse schwanken kurzfristig stark, langfristig gleicht sich das oft aus — Panik bei Rückgängen ist meist kein guter Ratgeber.</span>
-          </li>
-        </ul>
-        <p class="panel-note">Kurze Grundlagen, keine Anlageberatung.</p>
+      <div id="learnLevels" class="quiz-levels">
+        <div class="panel">
+          <h2>📚 Lernen</h2>
+          <p class="panel-note quiz-intro">Wähle einen Schwierigkeitsgrad und beantworte Fragen zu Investment-Basics. 3 Leben, Punkte für jede richtige Antwort.</p>
+          <ul id="learnLevelList" class="level-list"></ul>
+        </div>
+      </div>
+
+      <div id="learnQuiz" class="quiz-play hidden">
+        <div class="stats">
+          <div class="stat"><span class="label">Frage</span><span id="quizProgress" class="value">1/5</span></div>
+          <div class="stat"><span class="label">Punkte</span><span id="quizScore" class="value">0</span></div>
+          <div class="stat"><span class="label">Leben</span><span id="quizLives" class="value">❤️❤️❤️</span></div>
+        </div>
+
+        <div class="quiz-progress-track"><div id="quizProgressBar" class="quiz-progress-bar"></div></div>
+
+        <div class="panel quiz-panel">
+          <h2 id="quizQuestion">Frage</h2>
+          <ul id="quizAnswers" class="answer-list"></ul>
+          <p id="quizExplanation" class="quiz-explanation hidden"></p>
+          <button id="quizNext" class="btn next hidden">Weiter →</button>
+        </div>
+      </div>
+
+      <div id="learnResult" class="quiz-result hidden">
+        <div class="panel result-panel">
+          <div id="resultEmoji" class="result-emoji">🎉</div>
+          <h2 id="resultTitle">Geschafft!</h2>
+          <p id="resultSummary" class="panel-note"></p>
+          <div class="controls">
+            <button id="resultRetry" class="btn next">Nochmal versuchen</button>
+            <button id="resultBack" class="mini-btn">Zu den Leveln</button>
+          </div>
+        </div>
       </div>
     </section>
 
