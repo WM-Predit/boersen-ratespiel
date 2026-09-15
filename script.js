@@ -759,3 +759,11 @@ function finishQuiz() {
 
 document.getElementById('resultRetry').addEventListener('click', () => startQuiz(quiz.levelId));
 document.getElementById('resultBack').addEventListener('click', resetLearnView);
+
+// --- PWA: Service Worker ---
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
