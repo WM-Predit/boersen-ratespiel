@@ -231,16 +231,21 @@ function revealAndScore(guessUp, timedOut = false) {
   const pctChange = ((endPrice - startPrice) / startPrice) * 100;
   const correct = guessUp === actuallyUp;
   const revealColor = actuallyUp ? '#34d399' : '#fb7185';
+  const suspenseColor = '#facc15';
 
   let frame = HISTORY_POINTS;
   const timer = setInterval(() => {
     frame++;
-    draw(frame, { color: revealColor });
-    if (frame >= series.length) {
+    const isLastFrame = frame >= series.length;
+    // Während der Enthüllung bewusst eine neutrale Farbe zeigen, damit man
+    // dem Ergebnis nicht schon an der Linienfarbe ansieht, bevor sie fertig
+    // gezeichnet ist — erst im letzten Frame wird eingefärbt.
+    draw(frame, { color: isLastFrame ? revealColor : suspenseColor });
+    if (isLastFrame) {
       clearInterval(timer);
       showResult(correct, pctChange, timedOut);
     }
-  }, 40);
+  }, 55);
 }
 
 const CONFETTI_COLORS = ['#34d399', '#60a5fa', '#a78bfa', '#fb7185', '#facc15'];
