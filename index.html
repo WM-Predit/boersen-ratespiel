@@ -18,6 +18,10 @@
         <span class="menu-icon">📰</span>
         <span class="menu-label">News</span>
       </button>
+      <button class="menu-item" data-view="learn-view">
+        <span class="menu-icon">📚</span>
+        <span class="menu-label">Lernen</span>
+      </button>
       <button class="menu-item" data-view="game-view">
         <span class="menu-icon">📈📉</span>
         <span class="menu-label">Rauf oder Runter</span>
@@ -31,23 +35,50 @@
     <section id="news-view" class="view hidden">
       <button class="back-btn">← Zurück</button>
 
-      <div class="news">
+      <div class="panel">
         <h2>📰 Markt-News</h2>
-        <ul class="news-list">
+        <ul class="info-list">
           <li>
-            <span class="news-headline">DAX unter Druck</span>
-            <span class="news-desc">Steigende Ölpreise belasten die Märkte, der DAX hat zuletzt deutlich nachgegeben.</span>
+            <span class="info-headline">DAX unter Druck</span>
+            <span class="info-desc">Steigende Ölpreise belasten die Märkte, der DAX hat zuletzt deutlich nachgegeben.</span>
           </li>
           <li>
-            <span class="news-headline">BASF plant Börsengang der Agrarsparte</span>
-            <span class="news-desc">Das Agrargeschäft soll 2027 an die Frankfurter Börse gebracht werden — mögliche Bewertung: 20–30 Mrd. Euro.</span>
+            <span class="info-headline">BASF plant Börsengang der Agrarsparte</span>
+            <span class="info-desc">Das Agrargeschäft soll 2027 an die Frankfurter Börse gebracht werden — mögliche Bewertung: 20–30 Mrd. Euro.</span>
           </li>
           <li>
-            <span class="news-headline">Sartorius im Plus</span>
-            <span class="news-desc">Die Vorzugsaktie von Sartorius legte deutlich um +4,36% zu.</span>
+            <span class="info-headline">Sartorius im Plus</span>
+            <span class="info-desc">Die Vorzugsaktie von Sartorius legte deutlich um +4,36% zu.</span>
           </li>
         </ul>
-        <p class="news-note">Kurz zusammengefasst, damit du nicht alles selbst durchlesen musst. Keine Anlageberatung.</p>
+        <p class="panel-note">Kurz zusammengefasst, damit du nicht alles selbst durchlesen musst. Keine Anlageberatung.</p>
+      </div>
+    </section>
+
+    <section id="learn-view" class="view hidden">
+      <button class="back-btn">← Zurück</button>
+
+      <div class="panel">
+        <h2>📚 Lernen</h2>
+        <ul class="info-list">
+          <li>
+            <span class="info-headline">Diversifikation</span>
+            <span class="info-desc">Nicht alles auf eine Aktie setzen: Wer Branchen und Länder mischt, den trifft ein einzelner Rückschlag weniger hart.</span>
+          </li>
+          <li>
+            <span class="info-headline">Zinseszins</span>
+            <span class="info-desc">Zinsen auf Zinsen — wer früh anfängt, profitiert am meisten. Zeit ist beim Investieren einer der wichtigsten Faktoren.</span>
+          </li>
+          <li>
+            <span class="info-headline">ETFs</span>
+            <span class="info-desc">Ein ETF bündelt viele Aktien in einem Produkt — so streust du dein Risiko, ohne jede Aktie einzeln auswählen zu müssen.</span>
+          </li>
+          <li>
+            <span class="info-headline">Volatilität</span>
+            <span class="info-desc">Kurse schwanken kurzfristig stark, langfristig gleicht sich das oft aus — Panik bei Rückgängen ist meist kein guter Ratgeber.</span>
+          </li>
+        </ul>
+        <p class="panel-note">Kurze Grundlagen, keine Anlageberatung.</p>
       </div>
     </section>
 
