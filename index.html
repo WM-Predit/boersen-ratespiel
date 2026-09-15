@@ -62,22 +62,18 @@
     <section id="news-view" class="view hidden">
       <button class="back-btn">← Zurück</button>
 
+      <div class="ticker">
+        <div id="tickerTrack" class="ticker-track"></div>
+      </div>
+
+      <div id="newsTop" class="news-top"></div>
+
       <div class="panel">
-        <h2>📰 Markt-News</h2>
-        <ul class="info-list">
-          <li>
-            <span class="info-headline">DAX unter Druck</span>
-            <span class="info-desc">Steigende Ölpreise belasten die Märkte, der DAX hat zuletzt deutlich nachgegeben.</span>
-          </li>
-          <li>
-            <span class="info-headline">BASF plant Börsengang der Agrarsparte</span>
-            <span class="info-desc">Das Agrargeschäft soll 2027 an die Frankfurter Börse gebracht werden — mögliche Bewertung: 20–30 Mrd. Euro.</span>
-          </li>
-          <li>
-            <span class="info-headline">Sartorius im Plus</span>
-            <span class="info-desc">Die Vorzugsaktie von Sartorius legte deutlich um +4,36% zu.</span>
-          </li>
-        </ul>
+        <div class="depot-panel-head">
+          <h2>📰 Markt-News</h2>
+          <button id="newsShuffle" class="mini-btn">🔀 Neue Meldungen</button>
+        </div>
+        <ul id="newsList" class="info-list news-feed"></ul>
         <p class="panel-note">Kurz zusammengefasst, damit du nicht alles selbst durchlesen musst. Keine Anlageberatung.</p>
       </div>
     </section>

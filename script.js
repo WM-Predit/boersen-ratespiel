@@ -493,6 +493,71 @@ document.getElementById('depotReset').addEventListener('click', () => {
 
 renderDepot();
 
+// --- News ---
+
+const NEWS_POOL = [
+  { headline: 'DAX unter Druck', desc: 'Steigende Ölpreise belasten die Märkte, der DAX hat zuletzt deutlich nachgegeben.', category: 'Markt', sentiment: 'bearish', impact: 3 },
+  { headline: 'Fed signalisiert Zinssenkung', desc: 'Die Notenbank stellt eine lockerere Geldpolitik in Aussicht — die Börsen reagieren erleichtert.', category: 'Politik', sentiment: 'bullish', impact: 3 },
+  { headline: 'Öl auf Jahreshoch', desc: 'Geopolitische Spannungen treiben die Rohstoffpreise weiter nach oben.', category: 'Markt', sentiment: 'bearish', impact: 2 },
+  { headline: 'BASF plant Börsengang der Agrarsparte', desc: 'Das Agrargeschäft soll 2027 an die Frankfurter Börse gebracht werden — mögliche Bewertung: 20–30 Mrd. Euro.', category: 'Unternehmen', sentiment: 'bullish', impact: 2 },
+  { headline: 'Sartorius im Plus', desc: 'Die Vorzugsaktie von Sartorius legte deutlich um +4,36% zu.', category: 'Unternehmen', sentiment: 'bullish', impact: 1 },
+  { headline: 'Tech-Aktien unter Verkaufsdruck', desc: 'Sorge vor überzogenen Bewertungen im KI-Sektor lässt Kurse fallen.', category: 'Trend', sentiment: 'bearish', impact: 2 },
+  { headline: 'Neuer Rekord beim DAX in Sicht?', desc: 'Analysten sehen nach starken Quartalszahlen weiteres Kurspotenzial.', category: 'Markt', sentiment: 'bullish', impact: 2 },
+  { headline: 'Kryptomarkt in Bewegung', desc: 'Bitcoin schwankt stark, viele Anleger bleiben vorsichtig an der Seitenlinie.', category: 'Trend', sentiment: 'neutral', impact: 1 },
+  { headline: 'Inflation überrascht positiv', desc: 'Verbraucherpreise steigen langsamer als erwartet — Entspannung an den Märkten.', category: 'Politik', sentiment: 'bullish', impact: 2 },
+  { headline: 'Übernahmegerüchte belasten Branche', desc: 'Spekulationen um eine mögliche Fusion sorgen für Unsicherheit bei Investoren.', category: 'Unternehmen', sentiment: 'bearish', impact: 1 },
+];
+
+const SENTIMENT_META = {
+  bullish: { icon: '🟢', label: 'Bullish' },
+  bearish: { icon: '🔴', label: 'Bearish' },
+  neutral: { icon: '⚪', label: 'Neutral' },
+};
+
+function pickRandomNews(count) {
+  const shuffled = [...NEWS_POOL].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+function renderNews() {
+  const items = pickRandomNews(4);
+  const [topStory, ...rest] = items;
+
+  const topEl = document.getElementById('newsTop');
+  const sentiment = SENTIMENT_META[topStory.sentiment];
+  topEl.innerHTML = `
+    <div class="news-top-ribbon">🔥 Top Story</div>
+    <span class="news-chip category">${topStory.category}</span>
+    <span class="news-chip sentiment">${sentiment.icon} ${sentiment.label}</span>
+    <h3>${topStory.headline}</h3>
+    <p>${topStory.desc}</p>
+  `;
+
+  const listEl = document.getElementById('newsList');
+  listEl.innerHTML = '';
+  rest.forEach(item => {
+    const s = SENTIMENT_META[item.sentiment];
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="news-meta">
+        <span class="news-chip category">${item.category}</span>
+        <span class="news-chip sentiment">${s.icon}</span>
+        <span class="news-impact" title="Marktrelevanz">${'🔥'.repeat(item.impact)}</span>
+      </div>
+      <span class="info-headline">${item.headline}</span>
+      <span class="info-desc">${item.desc}</span>
+    `;
+    listEl.appendChild(li);
+  });
+
+  const trackEl = document.getElementById('tickerTrack');
+  const tickerText = NEWS_POOL.map(n => `${SENTIMENT_META[n.sentiment].icon} ${n.headline}`).join('   ★   ');
+  trackEl.textContent = tickerText + '   ★   ' + tickerText;
+}
+
+document.getElementById('newsShuffle').addEventListener('click', renderNews);
+renderNews();
+
 // --- Lernen: Quiz ---
 
 const LEARN_BEST_KEY = 'boersenspiel_learn_best';
