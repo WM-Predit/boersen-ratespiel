@@ -6,6 +6,10 @@ Ein kleines Browser-Spiel zum Üben des Gefühls für Kursverläufe: Du siehst e
 
 Einfach [`index.html`](index.html) im Browser öffnen — kein Build-Step, keine Abhängigkeiten.
 
+## Installieren (PWA)
+
+Die App ist eine Progressive Web App: über "Zum Home-Bildschirm hinzufügen" (iOS Safari) bzw. "App installieren" (Android Chrome, Desktop-Browser) lässt sie sich wie eine echte App installieren — mit eigenem Icon und ohne Browser-Leiste. Ein Service Worker (`sw.js`) cached die App-Shell, sodass sie danach auch offline startet. Das ist (noch) keine Veröffentlichung im Apple App Store oder Google Play Store, aber der einfachste Weg zu einem "App-Gefühl" ganz ohne Store-Anmeldung oder Review-Prozess.
+
 ## Wie es funktioniert
 
 - Ein zufälliger Kursverlauf wird über `generateSeries()` simuliert (Random Walk mit Drift und Volatilität, kein echtes Marktdaten-Feed).
