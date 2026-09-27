@@ -10,29 +10,67 @@ if (bootSplash.style.display !== 'none') {
 }
 
 const menu = document.getElementById('menu');
-document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    menu.classList.add('hidden');
-    document.getElementById(btn.dataset.view).classList.remove('hidden');
-    if (btn.dataset.view === 'learn-view') resetLearnView();
-    if (btn.dataset.view === 'game-view') newRound();
-    if (btn.dataset.view === 'news-view') updateTickerSpeed();
+const views = document.querySelectorAll('.view');
+// Merkt sich, aus welcher Ansicht das Lexikon geöffnet wurde (Quiz, News), damit "Zurück" dorthin führt statt ins Menü.
+let lexReturnView = null;
+
+// Timer einer Ansicht stoppen, sobald sie verlassen wird — sonst liefen sie unsichtbar im Hintergrund weiter.
+function leaveView(viewId) {
+  if (viewId === 'depot-view') stopDepotLive();
+  if (viewId === 'game-view') clearRoundTimer();
+}
+
+function openView(viewId) {
+  views.forEach(v => {
+    if (v.id !== viewId && !v.classList.contains('hidden')) leaveView(v.id);
   });
+  lexReturnView = null;
+  menu.classList.add('hidden');
+  views.forEach(v => v.classList.toggle('hidden', v.id !== viewId));
+  if (viewId === 'learn-view') resetLearnView();
+  if (viewId === 'game-view') newRound();
+  if (viewId === 'news-view') updateTickerSpeed();
+  if (viewId === 'daily-view') openDaily();
+  if (viewId === 'sparplan-view') renderSparplan();
+  if (viewId === 'lexikon-view') resetLexikon();
+  const hash = document.getElementById(viewId).dataset.hash;
+  if (hash) history.replaceState(null, '', '#' + hash);
+  window.scrollTo(0, 0);
+}
+
+function closeView(view) {
+  view.classList.add('hidden');
+  leaveView(view.id);
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  if (view.id === 'lexikon-view' && lexReturnView) {
+    const returnView = document.getElementById(lexReturnView);
+    returnView.classList.remove('hidden');
+    if (returnView.dataset.hash) history.replaceState(null, '', '#' + returnView.dataset.hash);
+    lexReturnView = null;
+    return;
+  }
+  menu.classList.remove('hidden');
+  updateDailyMenuLabel();
+}
+
+document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => openView(btn.dataset.view));
 });
 document.querySelectorAll('.back-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const view = btn.closest('.view');
-    view.classList.add('hidden');
-    menu.classList.remove('hidden');
-    if (view.id === 'depot-view') stopDepotLive();
-    if (view.id === 'game-view') clearRoundTimer();
-  });
+  btn.addEventListener('click', () => closeView(btn.closest('.view')));
+});
+// Querverweise zwischen den Bereichen: data-goto öffnet eine Ansicht, data-lex einen Lexikon-Eintrag.
+document.addEventListener('click', (e) => {
+  const goto = e.target.closest('[data-goto]');
+  const lex = e.target.closest('[data-lex]');
+  if (!goto && !lex) return;
+  e.preventDefault();
+  if (goto) openView(goto.dataset.goto);
+  else openLexikon(lex.dataset.lex);
 });
 
 const canvas = document.getElementById('chart');
 const ctx = canvas.getContext('2d');
-const W = canvas.width;
-const H = canvas.height;
 
 const HISTORY_POINTS = 90;
 const FUTURE_POINTS = 25;
@@ -122,13 +160,14 @@ function gaussianRandom() {
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 
-function generateSeries() {
+// rand/gauss sind austauschbar, damit die Tages-Challenge denselben Generator mit festem Seed nutzen kann.
+function generateSeries(rand = Math.random, gauss = gaussianRandom) {
   const total = HISTORY_POINTS + FUTURE_POINTS;
-  const drift = (Math.random() - 0.45) * 0.006;
-  const volatility = 0.012 + Math.random() * 0.022;
+  const drift = (rand() - 0.45) * 0.006;
+  const volatility = 0.012 + rand() * 0.022;
   const points = [100];
   for (let i = 1; i < total; i++) {
-    const shock = gaussianRandom() * volatility;
+    const shock = gauss() * volatility;
     const next = points[i - 1] * (1 + drift + shock);
     points.push(Math.max(5, next));
   }
@@ -136,6 +175,12 @@ function generateSeries() {
 }
 
 function draw(visibleCount, opts = {}) {
+  drawSeries(ctx, series, visibleCount, opts);
+}
+
+function drawSeries(ctx, series, visibleCount, opts = {}) {
+  const W = ctx.canvas.width;
+  const H = ctx.canvas.height;
   ctx.clearRect(0, 0, W, H);
 
   const visible = series.slice(0, visibleCount);
@@ -325,6 +370,318 @@ btnNext.addEventListener('click', () => {
   round++;
   newRound();
 });
+
+// --- Tages-Challenge ---
+
+// Jeden Tag dieselben DAILY_ROUNDS Kursverläufe für alle Spieler (Seed = Datum in Berlin), ein Versuch pro Tag, Ergebnis
+// als Emoji-Zeile zum Teilen. Der Zufallsgenerator nutzt bewusst nur Grundrechenarten (mulberry32 + Irwin-Hall statt
+// Box-Muller): Math.log/Math.cos dürfen je nach Browser in der letzten Stelle abweichen, dann sähen zwei Spieler
+// womöglich minimal andere Kurven.
+
+const DAILY_STORAGE_KEY = 'boersenspiel_daily';
+const DAILY_ROUNDS = 5;
+const DAILY_FIRST_DAY = '2026-09-27';
+const DAILY_SHARE_URL = 'https://boersen-ratespiel.github.io/#challenge';
+
+const dailyCanvas = document.getElementById('dailyChart');
+const dailyCtx = dailyCanvas.getContext('2d');
+const dailyEls = {
+  play: document.getElementById('dailyPlay'),
+  result: document.getElementById('dailyResult'),
+  round: document.getElementById('dailyRound'),
+  score: document.getElementById('dailyScore'),
+  streak: document.getElementById('dailyStreak'),
+  dots: document.getElementById('dailyDots'),
+  banner: document.getElementById('dailyBanner'),
+  up: document.getElementById('dailyUp'),
+  down: document.getElementById('dailyDown'),
+  next: document.getElementById('dailyNext'),
+  title: document.getElementById('dailyResultTitle'),
+  emojis: document.getElementById('dailyResultEmojis'),
+  summary: document.getElementById('dailyResultSummary'),
+  share: document.getElementById('dailyShare'),
+  shareStatus: document.getElementById('dailyShareStatus'),
+  countdown: document.getElementById('dailyCountdown'),
+  menuSub: document.getElementById('dailyMenuSub'),
+};
+
+let dailySeries = [];
+let dailyGuessing = false;
+let dailyCountdownTimer = null;
+
+function berlinDayKey(date = new Date()) {
+  // en-CA formatiert als JJJJ-MM-TT
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' }).format(date);
+}
+
+function shiftDayKey(dayKey, days) {
+  const d = new Date(dayKey + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function dailyNumber(dayKey) {
+  return Math.round((Date.parse(dayKey + 'T12:00:00Z') - Date.parse(DAILY_FIRST_DAY + 'T12:00:00Z')) / 86400000) + 1;
+}
+
+function hashString(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function dailySeriesFor(dayKey, roundIndex) {
+  const rand = mulberry32(hashString(`boersen-ratespiel|${dayKey}|${roundIndex}`));
+  // Irwin-Hall: Summe aus 12 Gleichverteilungen minus 6 ist näherungsweise standardnormalverteilt.
+  const gauss = () => {
+    let sum = 0;
+    for (let i = 0; i < 12; i++) sum += rand();
+    return sum - 6;
+  };
+  return generateSeries(rand, gauss);
+}
+
+function loadDailyState() {
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(DAILY_STORAGE_KEY));
+  } catch (e) {}
+  const state = {
+    date: null,
+    results: [],
+    streakDays: 0,
+    lastCompleted: null,
+    ...(saved && typeof saved === 'object' ? saved : {}),
+  };
+  if (!Array.isArray(state.results)) state.results = [];
+  return state;
+}
+
+function saveDailyState(state) {
+  try {
+    localStorage.setItem(DAILY_STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+// Tagesstand laden; an einem neuen Tag beginnt eine frische Challenge. Die Tagesserie bleibt nur bestehen,
+// wenn die letzte abgeschlossene Challenge gestern oder heute war.
+function currentDailyState() {
+  const today = berlinDayKey();
+  const state = loadDailyState();
+  if (state.date !== today) {
+    state.date = today;
+    state.results = [];
+  }
+  if (state.lastCompleted !== today && state.lastCompleted !== shiftDayKey(today, -1)) {
+    state.streakDays = 0;
+  }
+  return state;
+}
+
+function dailyHits(state) {
+  return state.results.filter(r => r.correct).length;
+}
+
+function dailyEmojiRow(state) {
+  return state.results.map(r => (r.correct ? '🟩' : '🟥')).join('');
+}
+
+function updateDailyMenuLabel() {
+  const state = currentDailyState();
+  if (state.results.length >= DAILY_ROUNDS) {
+    dailyEls.menuSub.textContent = `Heute gespielt: ${dailyHits(state)}/${DAILY_ROUNDS} ${dailyEmojiRow(state)}`;
+  } else if (state.results.length > 0) {
+    dailyEls.menuSub.textContent = `Weiterspielen: Runde ${state.results.length + 1} von ${DAILY_ROUNDS}`;
+  } else {
+    dailyEls.menuSub.textContent = `Neu: ${DAILY_ROUNDS} Kursverläufe, für alle gleich`;
+  }
+}
+
+function renderDailyStats(state) {
+  const roundNo = Math.min(state.results.length + 1, DAILY_ROUNDS);
+  dailyEls.round.textContent = `${roundNo}/${DAILY_ROUNDS}`;
+  dailyEls.score.textContent = `${dailyHits(state)}`;
+  dailyEls.streak.textContent = `${state.streakDays}`;
+  dailyEls.dots.innerHTML = '';
+  for (let i = 0; i < DAILY_ROUNDS; i++) {
+    const dot = document.createElement('span');
+    const r = state.results[i];
+    dot.className = 'daily-dot' + (r ? (r.correct ? ' hit' : ' miss') : i === state.results.length ? ' current' : '');
+    dailyEls.dots.appendChild(dot);
+  }
+}
+
+function openDaily() {
+  const state = currentDailyState();
+  saveDailyState(state);
+  if (state.results.length >= DAILY_ROUNDS) {
+    showDailyResult(state);
+  } else {
+    dailyEls.result.classList.add('hidden');
+    dailyEls.play.classList.remove('hidden');
+    startDailyRound(state);
+  }
+}
+
+function startDailyRound(state) {
+  dailySeries = dailySeriesFor(state.date, state.results.length);
+  dailyGuessing = true;
+  dailyEls.banner.classList.add('hidden');
+  dailyEls.banner.classList.remove('correct', 'wrong');
+  dailyEls.next.classList.add('hidden');
+  dailyEls.up.disabled = false;
+  dailyEls.down.disabled = false;
+  renderDailyStats(state);
+  drawSeries(dailyCtx, dailySeries, HISTORY_POINTS);
+}
+
+function dailyGuess(guessUp) {
+  if (!dailyGuessing) return;
+  dailyGuessing = false;
+  dailyEls.up.disabled = true;
+  dailyEls.down.disabled = true;
+
+  const startPrice = dailySeries[HISTORY_POINTS - 1];
+  const endPrice = dailySeries[dailySeries.length - 1];
+  const actuallyUp = endPrice > startPrice;
+  const pctChange = ((endPrice - startPrice) / startPrice) * 100;
+  const correct = guessUp === actuallyUp;
+
+  // Tipp sofort speichern: Neu laden während der Animation darf keinen zweiten Versuch ergeben.
+  const state = currentDailyState();
+  state.results.push({ correct, up: actuallyUp });
+  const finished = state.results.length >= DAILY_ROUNDS;
+  if (finished) {
+    state.streakDays = state.lastCompleted === shiftDayKey(state.date, -1) ? state.streakDays + 1 : 1;
+    state.lastCompleted = state.date;
+  }
+  saveDailyState(state);
+
+  const revealColor = actuallyUp ? '#34d399' : '#fb7185';
+  const series = dailySeries;
+  let frame = HISTORY_POINTS;
+  const timer = setInterval(() => {
+    frame++;
+    const isLastFrame = frame >= series.length;
+    drawSeries(dailyCtx, series, frame, { color: isLastFrame ? revealColor : '#facc15' });
+    if (!isLastFrame) return;
+    clearInterval(timer);
+    const sign = pctChange >= 0 ? '+' : '';
+    dailyEls.banner.textContent = `${correct ? '✅ Richtig!' : '❌ Falsch.'} ${sign}${pctChange.toFixed(1)}%`;
+    dailyEls.banner.classList.remove('hidden');
+    dailyEls.banner.classList.add(correct ? 'correct' : 'wrong');
+    if (correct) burstConfetti();
+    renderDailyStats(state);
+    dailyEls.next.textContent = finished ? 'Ergebnis ansehen →' : 'Nächster Kurs →';
+    dailyEls.next.classList.remove('hidden');
+  }, 55);
+}
+
+function dailyShareText(state) {
+  const hits = dailyHits(state);
+  const lines = [
+    `📈 Börsen-Ratespiel · Tages-Challenge #${dailyNumber(state.date)}`,
+    `${dailyEmojiRow(state)} ${hits}/${DAILY_ROUNDS}`,
+  ];
+  if (state.streakDays > 1) lines.push(`🔥 ${state.streakDays} Tage in Folge`);
+  lines.push(DAILY_SHARE_URL);
+  return lines.join('\n');
+}
+
+function dailyVerdict(hits) {
+  if (hits === DAILY_ROUNDS) return { emoji: '🏆', title: 'Perfekt! Alle Kurse richtig getippt' };
+  if (hits >= 4) return { emoji: '🎉', title: 'Starkes Gespür für den Markt!' };
+  if (hits >= 3) return { emoji: '👍', title: 'Mehr Treffer als Nieten' };
+  if (hits >= 2) return { emoji: '🎲', title: 'Der Markt war heute launisch' };
+  return { emoji: '🙈', title: 'Heute lag der Markt anders' };
+}
+
+function showDailyResult(state) {
+  dailyEls.play.classList.add('hidden');
+  dailyEls.result.classList.remove('hidden');
+  const hits = dailyHits(state);
+  const verdict = dailyVerdict(hits);
+  dailyEls.title.textContent = `${verdict.emoji} ${verdict.title}`;
+  dailyEls.emojis.textContent = dailyEmojiRow(state);
+  const streakText = state.streakDays > 1 ? ` · 🔥 ${state.streakDays} Tage in Folge` : '';
+  dailyEls.summary.textContent = `Tages-Challenge #${dailyNumber(state.date)}: ${hits} von ${DAILY_ROUNDS} richtig${streakText}`;
+  dailyEls.shareStatus.textContent = '';
+  if (hits === DAILY_ROUNDS) burstConfetti();
+  startDailyCountdown();
+}
+
+function startDailyCountdown() {
+  clearInterval(dailyCountdownTimer);
+  const today = berlinDayKey();
+  const update = () => {
+    if (dailyEls.result.classList.contains('hidden') || document.getElementById('daily-view').classList.contains('hidden')) {
+      clearInterval(dailyCountdownTimer);
+      return;
+    }
+    if (berlinDayKey() !== today) {
+      clearInterval(dailyCountdownTimer);
+      dailyEls.countdown.innerHTML = 'Die neue Challenge ist da! <button class="link-btn" id="dailyReload">Jetzt spielen</button>';
+      document.getElementById('dailyReload').addEventListener('click', openDaily);
+      return;
+    }
+    // Mitternacht in Berlin: kleinsten Zeitpunkt suchen, an dem der Berliner Tag wechselt (minutengenau reicht).
+    const now = Date.now();
+    let lo = now, hi = now + 26 * 3600000;
+    while (hi - lo > 1000) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (berlinDayKey(new Date(mid)) === today) lo = mid; else hi = mid;
+    }
+    const left = Math.max(0, hi - now);
+    const h = Math.floor(left / 3600000);
+    const m = Math.floor((left % 3600000) / 60000);
+    const s = Math.floor((left % 60000) / 1000);
+    dailyEls.countdown.textContent = `Nächste Challenge in ${h} Std. ${String(m).padStart(2, '0')} Min. ${String(s).padStart(2, '0')} Sek.`;
+  };
+  update();
+  dailyCountdownTimer = setInterval(update, 1000);
+}
+
+async function shareDaily() {
+  const text = dailyShareText(currentDailyState());
+  if (navigator.share) {
+    try {
+      await navigator.share({ text });
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    dailyEls.shareStatus.textContent = '✅ Ergebnis kopiert — jetzt einfach in WhatsApp & Co. einfügen.';
+  } catch (e) {
+    dailyEls.shareStatus.textContent = text;
+  }
+}
+
+dailyEls.up.addEventListener('click', () => dailyGuess(true));
+dailyEls.down.addEventListener('click', () => dailyGuess(false));
+dailyEls.next.addEventListener('click', () => {
+  const state = currentDailyState();
+  if (state.results.length >= DAILY_ROUNDS) showDailyResult(state);
+  else startDailyRound(state);
+});
+dailyEls.share.addEventListener('click', shareDaily);
+updateDailyMenuLabel();
 
 // --- Musterdepot ---
 
@@ -655,6 +1012,7 @@ const newsEls = {
   list: document.getElementById('newsList'),
   note: document.getElementById('newsNote'),
   shuffle: document.getElementById('newsShuffle'),
+  terms: document.getElementById('newsTerms'),
 };
 
 function escapeHtml(value) {
@@ -784,6 +1142,7 @@ function renderNews() {
     newsEls.top.innerHTML = '<p class="news-loading">Meldungen werden geladen …</p>';
     newsEls.list.innerHTML = '';
     newsEls.note.textContent = '';
+    newsEls.terms.classList.add('hidden');
     newsEls.shuffle.disabled = true;
     return;
   }
@@ -826,6 +1185,14 @@ function renderNews() {
     `;
     newsEls.list.appendChild(li);
   });
+
+  // Fachbegriffe aus den Meldungen dieser Seite, die das Lexikon erklärt.
+  const terms = lexTermsFor(page.map(item => `${item.headline} ${item.desc}`).join(' '));
+  newsEls.terms.classList.toggle('hidden', terms.length === 0);
+  newsEls.terms.innerHTML = terms.length
+    ? '<span class="news-terms-label">📖 Begriffe erklärt:</span> ' +
+      terms.map(t => `<button class="news-term" data-lex="${escapeHtml(t.id)}">${escapeHtml(t.title)}</button>`).join('')
+    : '';
 
   if (newsState.live) {
     const stand = newsState.updated
@@ -983,29 +1350,98 @@ const LEVELS = [
   { id: 'schwer', name: 'Schwer', icon: '🔥', points: 30, desc: 'Echte Profi-Fragen' },
 ];
 
+// Pro Durchlauf werden QUIZ_ROUND_SIZE Fragen zufällig aus dem Level gezogen und die Antworten gemischt.
+// "correct" ist der Index der richtigen Antwort in "options", "lex" (optional) die ID eines Lexikon-Eintrags.
 const QUIZ_DATA = {
   leicht: [
-    { q: 'Was ist eine Aktie?', options: ['Ein Anteil an einem Unternehmen', 'Ein Kredit an den Staat', 'Eine Versicherung gegen Kursverluste'], correct: 0, explain: 'Eine Aktie ist ein Anteilsschein — du wirst Miteigentümer des Unternehmens.' },
-    { q: 'Was bedeutet "Diversifikation"?', options: ['Alles Geld in eine Aktie stecken', 'Geld auf mehrere Anlagen verteilen', 'Geld nur in bar halten'], correct: 1, explain: 'Streuung über mehrere Anlagen reduziert das Risiko einzelner Rückschläge.' },
-    { q: 'Was ist ein ETF?', options: ['Ein börsengehandelter Fonds, der einen Index nachbildet', 'Eine Kryptowährung', 'Ein Sparbuch der Bank'], correct: 0, explain: 'ETF = Exchange Traded Fund. Er bündelt viele Aktien in einem Produkt.' },
-    { q: 'Was ist der DAX?', options: ['Eine deutsche Bank', 'Der wichtigste deutsche Aktienindex', 'Eine Steuer auf Aktiengewinne'], correct: 1, explain: 'Der DAX bildet die größten deutschen Unternehmen an der Börse ab.' },
-    { q: 'Was passiert beim Zinseszins?', options: ['Das Geld bleibt immer gleich', 'Zinsen erwirtschaften wieder Zinsen', 'Das Geld verliert automatisch an Wert'], correct: 1, explain: 'Zinseszins lässt dein Vermögen umso stärker wachsen, je länger du investiert bleibst.' },
+    { q: 'Was ist eine Aktie?', options: ['Ein Anteil an einem Unternehmen', 'Ein Kredit an den Staat', 'Eine Versicherung gegen Kursverluste'], correct: 0, explain: 'Eine Aktie ist ein Anteilsschein — du wirst Miteigentümer des Unternehmens.', lex: 'aktie' },
+    { q: 'Was bedeutet "Diversifikation"?', options: ['Alles Geld in eine Aktie stecken', 'Geld auf mehrere Anlagen verteilen', 'Geld nur in bar halten'], correct: 1, explain: 'Streuung über mehrere Anlagen reduziert das Risiko einzelner Rückschläge.', lex: 'diversifikation' },
+    { q: 'Was ist ein ETF?', options: ['Ein börsengehandelter Fonds, der einen Index nachbildet', 'Eine Kryptowährung', 'Ein Sparbuch der Bank'], correct: 0, explain: 'ETF = Exchange Traded Fund. Er bündelt viele Aktien in einem Produkt.', lex: 'etf' },
+    { q: 'Was ist der DAX?', options: ['Eine deutsche Bank', 'Der wichtigste deutsche Aktienindex', 'Eine Steuer auf Aktiengewinne'], correct: 1, explain: 'Der DAX bildet die größten deutschen Unternehmen an der Börse ab.', lex: 'dax' },
+    { q: 'Was passiert beim Zinseszins?', options: ['Das Geld bleibt immer gleich', 'Zinsen erwirtschaften wieder Zinsen', 'Das Geld verliert automatisch an Wert'], correct: 1, explain: 'Zinseszins lässt dein Vermögen umso stärker wachsen, je länger du investiert bleibst.', lex: 'zinseszins' },
+    { q: 'Was ist eine Anleihe?', options: ['Ein Anteil an einem Unternehmen', 'Ein Kredit, den du einem Staat oder Unternehmen gibst', 'Ein Sparkonto mit Zinsgarantie der Bank'], correct: 1, explain: 'Mit einer Anleihe leihst du dem Herausgeber Geld und bekommst dafür meist feste Zinsen.', lex: 'anleihe' },
+    { q: 'Was ist ein Sparplan?', options: ['Regelmäßig einen festen Betrag investieren', 'Einmalig das ganze Geld auf einmal anlegen', 'Ein Kredit, um Aktien zu kaufen'], correct: 0, explain: 'Beim Sparplan investierst du automatisch z. B. jeden Monat denselben Betrag.', lex: 'sparplan' },
+    { q: 'Was bedeutet Inflation?', options: ['Die Aktienkurse fallen', 'Die Zinsen sinken auf null', 'Die Preise steigen allgemein, Geld verliert an Kaufkraft'], correct: 2, explain: 'Bei Inflation bekommst du für denselben Betrag mit der Zeit weniger.', lex: 'inflation' },
+    { q: 'Was ist ein Depot?', options: ['Ein Konto, auf dem deine Wertpapiere verwahrt werden', 'Ein Tresor für Bargeld', 'Eine Versicherung für Aktien'], correct: 0, explain: 'Ohne Depot kannst du keine Aktien oder ETFs kaufen — es ist quasi das Girokonto für Wertpapiere.', lex: 'depot' },
+    { q: 'Was ist eine Rendite?', options: ['Die Gebühr beim Kauf einer Aktie', 'Der Ertrag einer Geldanlage, meist in Prozent pro Jahr', 'Die Anzahl der gekauften Aktien'], correct: 1, explain: 'Rendite = Kursgewinne plus Zinsen oder Dividenden, bezogen auf das eingesetzte Geld.', lex: 'rendite' },
+    { q: 'Was beschreibt ein "Bullenmarkt"?', options: ['Eine Phase mit überwiegend steigenden Kursen', 'Eine Phase mit überwiegend fallenden Kursen', 'Einen Markt für Agrarprodukte'], correct: 0, explain: 'Der Bulle stößt mit den Hörnern von unten nach oben — die Kurse steigen.', lex: 'bullenmarkt' },
+    { q: 'Was ist ein Aktienindex?', options: ['Eine Liste der Verlierer des Tages', 'Die Steuernummer einer Aktie', 'Eine Kennzahl, die die Entwicklung mehrerer Aktien zusammenfasst'], correct: 2, explain: 'Ein Index wie der DAX zeigt auf einen Blick, wie sich eine Gruppe von Aktien entwickelt.', lex: 'index' },
+    { q: 'Was ist Tagesgeld?', options: ['Eine Aktie, die nur einen Tag gehandelt wird', 'Ein verzinstes Konto, über das du täglich verfügen kannst', 'Der Tageslohn an der Börse'], correct: 1, explain: 'Tagesgeld eignet sich gut für den Notgroschen: jederzeit verfügbar, in der EU bis 100.000 € gesetzlich abgesichert.', lex: 'tagesgeld' },
+    { q: 'Warum schwanken Aktienkurse?', options: ['Weil sich Angebot und Nachfrage ständig ändern', 'Weil die Börse die Kurse auslost', 'Weil der Staat die Kurse täglich festlegt'], correct: 0, explain: 'Wollen mehr Menschen kaufen als verkaufen, steigt der Kurs — und umgekehrt.', lex: 'boerse' },
+    { q: 'Was ist der MSCI World?', options: ['Die Weltbank', 'Ein Aktienindex mit Unternehmen aus vielen Industrieländern', 'Eine internationale Kryptobörse'], correct: 1, explain: 'Der MSCI World enthält rund 1.400 Unternehmen aus 23 Industrieländern und ist bei ETF-Sparplänen sehr beliebt.', lex: 'msci-world' },
+    { q: 'Was ist eine Order?', options: ['Eine Dividendenzahlung', 'Ein Kauf- oder Verkaufsauftrag für ein Wertpapier', 'Ein Aktienindex'], correct: 1, explain: 'Mit einer Order sagst du deinem Broker, was er zu welchen Bedingungen kaufen oder verkaufen soll.', lex: 'order' },
+    { q: 'Was macht ein Broker?', options: ['Er führt deine Kauf- und Verkaufsaufträge für Wertpapiere aus', 'Er berechnet den DAX', 'Er zieht die Steuern auf Aktien ein und legt sie fest'], correct: 0, explain: 'Über einen Broker (z. B. eine Bank oder eine App) handelst du an der Börse.', lex: 'broker' },
+    { q: 'Was ist ein Fonds?', options: ['Eine einzelne Aktie', 'Ein Kreditvertrag mit der Bank', 'Ein Topf, in dem das Geld vieler Anleger gemeinsam angelegt wird'], correct: 2, explain: 'Ein Fonds bündelt das Geld vieler Anleger und verteilt es auf viele Wertpapiere.', lex: 'fonds' },
+    { q: 'Welche dieser Anlagen schwankt im Wert typischerweise am wenigsten?', options: ['Tagesgeld', 'Die Aktie eines jungen Tech-Start-ups', 'Eine Kryptowährung'], correct: 0, explain: 'Tagesgeld hat keinen Kurs, der schwankt — dafür sind auch die Renditechancen geringer.', lex: 'tagesgeld' },
+    { q: 'Was ist ein Notgroschen?', options: ['Eine seltene Sammlermünze', 'Eine Geldreserve für unerwartete Ausgaben, die schnell verfügbar ist', 'Ein besonders günstiger ETF'], correct: 1, explain: 'Als Faustregel gelten oft drei bis sechs Monatsausgaben — bevor man an der Börse investiert.', lex: 'tagesgeld' },
   ],
   mittel: [
-    { q: 'Was ist Volatilität?', options: ['Die Dividendenhöhe', 'Das Ausmaß der Kursschwankungen', 'Die Anzahl der Aktionäre'], correct: 1, explain: 'Volatilität beschreibt, wie stark ein Kurs schwankt.' },
-    { q: 'Was ist eine Dividende?', options: ['Eine Gewinnbeteiligung für Aktionäre', 'Eine Strafe für den Verkauf', 'Der Kaufpreis einer Aktie'], correct: 0, explain: 'Unternehmen schütten damit einen Teil ihres Gewinns an Aktionäre aus.' },
-    { q: 'Was bedeutet "Bärenmarkt"?', options: ['Ein Markt mit steigenden Kursen', 'Ein Markt mit fallenden Kursen über längere Zeit', 'Ein Markt nur für Rohstoffe'], correct: 1, explain: 'Ein Bärenmarkt beschreibt eine anhaltende Abwärtsphase.' },
-    { q: 'Warum hilft ein langer Anlagehorizont?', options: ['Kurzfristige Schwankungen gleichen sich eher aus', 'Man zahlt automatisch weniger Steuern', 'Aktien werden mit der Zeit garantiert günstiger'], correct: 0, explain: 'Je länger der Zeitraum, desto eher gleichen sich kurzfristige Ausschläge aus.' },
-    { q: 'Was unterscheidet Sparen von Investieren?', options: ['Kein Unterschied', 'Sparen ist risikofrei, Investieren trägt Risiko für höhere Renditechancen', 'Investieren ist immer sicherer'], correct: 1, explain: 'Investieren bedeutet, für die Chance auf höhere Rendite Risiko einzugehen.' },
+    { q: 'Was ist Volatilität?', options: ['Die Dividendenhöhe', 'Das Ausmaß der Kursschwankungen', 'Die Anzahl der Aktionäre'], correct: 1, explain: 'Volatilität beschreibt, wie stark ein Kurs schwankt.', lex: 'volatilitaet' },
+    { q: 'Was ist eine Dividende?', options: ['Eine Gewinnbeteiligung für Aktionäre', 'Eine Strafe für den Verkauf', 'Der Kaufpreis einer Aktie'], correct: 0, explain: 'Unternehmen schütten damit einen Teil ihres Gewinns an Aktionäre aus.', lex: 'dividende' },
+    { q: 'Was bedeutet "Bärenmarkt"?', options: ['Ein Markt mit steigenden Kursen', 'Ein Markt mit fallenden Kursen über längere Zeit', 'Ein Markt nur für Rohstoffe'], correct: 1, explain: 'Ein Bärenmarkt beschreibt eine anhaltende Abwärtsphase.', lex: 'baerenmarkt' },
+    { q: 'Warum hilft ein langer Anlagehorizont?', options: ['Kurzfristige Schwankungen gleichen sich eher aus', 'Man zahlt automatisch weniger Steuern', 'Aktien werden mit der Zeit garantiert günstiger'], correct: 0, explain: 'Je länger der Zeitraum, desto eher gleichen sich kurzfristige Ausschläge aus.', lex: 'zinseszins' },
+    { q: 'Was unterscheidet Sparen von Investieren?', options: ['Kein Unterschied', 'Sparen ist risikoarm, Investieren trägt Risiko für höhere Renditechancen', 'Investieren ist immer sicherer'], correct: 1, explain: 'Investieren bedeutet, für die Chance auf höhere Rendite Risiko einzugehen.', lex: 'rendite' },
+    { q: 'Was ist der Leitzins?', options: ['Der Zins auf deinem Girokonto', 'Der Zins, zu dem sich Geschäftsbanken bei der Zentralbank Geld leihen können', 'Die Dividende der Zentralbank'], correct: 1, explain: 'Über den Leitzins steuert die Zentralbank, wie teuer Geld in der Wirtschaft ist.', lex: 'leitzins' },
+    { q: 'Wer legt die Leitzinsen im Euroraum fest?', options: ['Die Bundesregierung', 'Die Deutsche Börse', 'Die Europäische Zentralbank (EZB)'], correct: 2, explain: 'Der EZB-Rat entscheidet etwa alle sechs Wochen über die Leitzinsen im Euroraum.', lex: 'ezb' },
+    { q: 'Was misst das Bruttoinlandsprodukt (BIP)?', options: ['Den Wert aller in einem Land erzeugten Waren und Dienstleistungen', 'Die Staatsschulden eines Landes', 'Den Stand des DAX'], correct: 0, explain: 'Das BIP ist das wichtigste Maß für die Wirtschaftsleistung eines Landes.', lex: 'bip' },
+    { q: 'Was gibt die TER eines ETFs an?', options: ['Die Rendite im letzten Jahr', 'Die laufenden jährlichen Kosten in Prozent', 'Die Anzahl der Aktien im ETF'], correct: 1, explain: 'TER = Total Expense Ratio. Sie wird automatisch aus dem Fondsvermögen entnommen.', lex: 'ter' },
+    { q: 'Was macht ein thesaurierender ETF mit den Dividenden?', options: ['Er legt sie automatisch wieder an', 'Er zahlt sie an dich aus', 'Er gibt sie an den Staat ab'], correct: 0, explain: 'Thesaurierend = wiederanlegend. Ein ausschüttender ETF zahlt die Erträge dagegen aus.', lex: 'thesaurierend' },
+    { q: 'Was ist die Marktkapitalisierung?', options: ['Der Jahresumsatz eines Unternehmens', 'Der Börsenwert: Aktienkurs × Anzahl aller Aktien', 'Das Bargeld auf dem Firmenkonto'], correct: 1, explain: 'Sie zeigt, wie viel ein Unternehmen an der Börse insgesamt wert ist.', lex: 'marktkapitalisierung' },
+    { q: 'Was beschreibt der Cost-Average-Effekt beim Sparplan?', options: ['Man zahlt keine Gebühren', 'Man erhält garantiert eine höhere Rendite', 'Mit festem Betrag kauft man bei niedrigen Kursen mehr und bei hohen weniger Anteile'], correct: 2, explain: 'Das glättet den durchschnittlichen Einstiegspreis — eine Renditegarantie ist es aber nicht.', lex: 'cost-average' },
+    { q: 'Was passiert meist mit den Kursen bestehender Anleihen, wenn die Marktzinsen steigen?', options: ['Sie fallen', 'Sie steigen', 'Sie bleiben immer gleich'], correct: 0, explain: 'Neue Anleihen bieten dann höhere Zinsen — ältere mit niedrigerem Zins werden weniger attraktiv.', lex: 'anleihe' },
+    { q: 'Was ist eine Limit-Order?', options: ['Ein Auftrag, der sofort zu jedem Preis ausgeführt wird', 'Ein Auftrag, der nur zu deinem Wunschpreis oder besser ausgeführt wird', 'Eine Obergrenze, wie viele Aktien man besitzen darf'], correct: 1, explain: 'So schützt du dich davor, in hektischen Phasen zu einem schlechten Kurs zu kaufen oder zu verkaufen.', lex: 'order' },
+    { q: 'Wie hoch ist der Sparerpauschbetrag in Deutschland pro Person und Jahr (seit 2023)?', options: ['801 €', '1.000 €', '10.000 €'], correct: 1, explain: 'Kapitalerträge bis 1.000 € (Ehepaare 2.000 €) bleiben steuerfrei — per Freistellungsauftrag bei der Bank.', lex: 'sparerpauschbetrag' },
+    { q: 'Was ist die "Realrendite"?', options: ['Die Rendite in US-Dollar', 'Die Rendite vor Steuern', 'Die Rendite nach Abzug der Inflation'], correct: 2, explain: '5 % Rendite bei 3 % Inflation ergeben ungefähr 2 % echten Kaufkraftzuwachs.', lex: 'inflation' },
+    { q: 'Was ist der Spread beim Wertpapierhandel?', options: ['Der Unterschied zwischen Kauf- und Verkaufskurs', 'Die Höhe der Dividende', 'Das Kursziel von Analysten'], correct: 0, explain: 'Wer sofort kauft und wieder verkauft, verliert genau diesen Unterschied.', lex: 'spread' },
+    { q: 'Was passiert auf der Hauptversammlung einer Aktiengesellschaft?', options: ['Die Börse legt den Aktienkurs fest', 'Die Aktionäre stimmen z. B. über die Verwendung des Gewinns ab', 'Die EZB entscheidet über die Zinsen'], correct: 1, explain: 'Auf der Hauptversammlung wird unter anderem über die Dividende abgestimmt.', lex: 'dividende' },
+    { q: 'Was ist ein Schwellenland (Emerging Market)?', options: ['Ein Land mit wachsender Wirtschaft auf dem Weg zum Industrieland', 'Ein Land ohne eigene Börse', 'Ein Land, das keine Steuern erhebt'], correct: 0, explain: 'Beispiele sind Indien oder Brasilien. Im MSCI World sind Schwellenländer nicht enthalten.', lex: 'msci-world' },
+    { q: 'Wie viele Unternehmen enthält der DAX seit 2021?', options: ['30', '40', '100'], correct: 1, explain: 'Im September 2021 wurde der DAX von 30 auf 40 Unternehmen erweitert.', lex: 'dax' },
   ],
   schwer: [
-    { q: 'Was misst die Sharpe Ratio?', options: ['Rendite im Verhältnis zum eingegangenen Risiko', 'Die Dividendenrendite', 'Die Marktkapitalisierung'], correct: 0, explain: 'Die Sharpe Ratio zeigt, wie viel Rendite pro Risikoeinheit erzielt wurde.' },
-    { q: 'Was ist ein Rebalancing?', options: ['Das Zurücksetzen des Depots auf die Ursprungsgewichtung', 'Der Verkauf aller Positionen', 'Eine Steuerstrategie'], correct: 0, explain: 'Rebalancing stellt die ursprünglich geplante Aufteilung des Depots wieder her.' },
-    { q: 'Was zeigt das Kurs-Gewinn-Verhältnis (KGV)?', options: ['Verhältnis von Aktienkurs zu Gewinn je Aktie', 'Verhältnis von Umsatz zu Mitarbeitern', 'Verhältnis von Dividende zu Kurs'], correct: 0, explain: 'Das KGV setzt den Aktienkurs ins Verhältnis zum Gewinn je Aktie.' },
-    { q: 'Was ist ein "Blue Chip"?', options: ['Eine besonders volatile Kleinstaktie', 'Eine etablierte, finanzstarke Standardaktie', 'Ein spezieller Anleihe-Typ'], correct: 1, explain: 'Blue Chips sind große, etablierte Unternehmen mit stabiler Marktstellung.' },
+    { q: 'Was misst die Sharpe Ratio?', options: ['Rendite im Verhältnis zum eingegangenen Risiko', 'Die Dividendenrendite', 'Die Marktkapitalisierung'], correct: 0, explain: 'Die Sharpe Ratio zeigt, wie viel Rendite pro Risikoeinheit erzielt wurde.', lex: 'volatilitaet' },
+    { q: 'Was ist ein Rebalancing?', options: ['Das Zurücksetzen des Depots auf die Ursprungsgewichtung', 'Der Verkauf aller Positionen', 'Eine Steuerstrategie'], correct: 0, explain: 'Rebalancing stellt die ursprünglich geplante Aufteilung des Depots wieder her.', lex: 'rebalancing' },
+    { q: 'Was zeigt das Kurs-Gewinn-Verhältnis (KGV)?', options: ['Verhältnis von Aktienkurs zu Gewinn je Aktie', 'Verhältnis von Umsatz zu Mitarbeitern', 'Verhältnis von Dividende zu Kurs'], correct: 0, explain: 'Das KGV setzt den Aktienkurs ins Verhältnis zum Gewinn je Aktie.', lex: 'kgv' },
+    { q: 'Was ist ein "Blue Chip"?', options: ['Eine besonders volatile Kleinstaktie', 'Eine etablierte, finanzstarke Standardaktie', 'Ein spezieller Anleihe-Typ'], correct: 1, explain: 'Blue Chips sind große, etablierte Unternehmen mit stabiler Marktstellung.', lex: 'blue-chip' },
     { q: 'Was besagt die Effizienzmarkthypothese?', options: ['Märkte reagieren nie auf neue Informationen', 'Alle verfügbaren Informationen spiegeln sich bereits im Kurs wider', 'Nur institutionelle Anleger können den Markt schlagen'], correct: 1, explain: 'Sie besagt, dass Kurse verfügbare Informationen bereits einpreisen.' },
+    { q: 'Wie funktioniert ein Leerverkauf (Short)?', options: ['Man hält eine Aktie kürzer als einen Tag', 'Man verkauft geliehene Aktien und hofft, sie später günstiger zurückzukaufen', 'Man kauft nur Bruchteile einer Aktie'], correct: 1, explain: 'Wer short geht, setzt auf fallende Kurse — steigt der Kurs, ist der Verlust theoretisch unbegrenzt.', lex: 'leerverkauf' },
+    { q: 'Was ist eine Stop-Loss-Order?', options: ['Ein Verkaufsauftrag, der ausgelöst wird, wenn der Kurs eine festgelegte Marke unterschreitet', 'Ein Kaufauftrag unter dem aktuellen Kurs', 'Ein Handelsstopp der Börse'], correct: 0, explain: 'Sie soll Verluste begrenzen. Bei Kurslücken kann der Verkauf aber deutlich unter der Marke erfolgen.', lex: 'order' },
+    { q: 'Was beschreibt die Tracking Difference eines ETFs?', options: ['Den Unterschied zwischen Kauf- und Verkaufskurs', 'Die Anzahl der Indexmitglieder', 'Die Abweichung der ETF-Rendite von der Rendite des Index'], correct: 2, explain: 'Sie zeigt, wie gut ein ETF seinen Index inklusive aller Kosten tatsächlich abbildet.', lex: 'ter' },
+    { q: 'Was sagt ein Beta von 1,5 über eine Aktie aus?', options: ['Sie schwankt im Schnitt etwa 1,5-mal so stark wie der Gesamtmarkt', 'Sie zahlt 1,5 % Dividende', 'Sie ist 1,5-mal so viel wert wie ihr Buchwert'], correct: 0, explain: 'Das Beta misst, wie stark eine Aktie im Vergleich zum Markt reagiert.', lex: 'volatilitaet' },
+    { q: 'Was misst die Duration einer Anleihe?', options: ['Die Höhe des Kupons', 'Wie empfindlich der Anleihekurs auf Zinsänderungen reagiert', 'Die Bonität des Herausgebers'], correct: 1, explain: 'Je höher die Duration, desto stärker fällt der Kurs, wenn die Zinsen steigen.', lex: 'anleihe' },
+    { q: 'Was bedeutet eine inverse Zinsstrukturkurve?', options: ['Alle Zinsen sind negativ', 'Langfristige Zinsen sind höher als kurzfristige', 'Kurzfristige Zinsen sind höher als langfristige'], correct: 2, explain: 'Das ist ungewöhnlich und ging in der Vergangenheit oft Rezessionen voraus — ein sicheres Signal ist es aber nicht.', lex: 'leitzins' },
+    { q: 'Was ist Quantitative Easing (QE)?', options: ['Eine Steuersenkung für Unternehmen', 'Die Zentralbank kauft in großem Umfang Wertpapiere, um die Geldpolitik zu lockern', 'Eine Regel für den Hochfrequenzhandel'], correct: 1, explain: 'Durch die Käufe sinken die langfristigen Zinsen — ein Werkzeug, wenn die Leitzinsen schon sehr niedrig sind.', lex: 'leitzins' },
+    { q: 'Was setzt das Kurs-Buchwert-Verhältnis (KBV) ins Verhältnis?', options: ['Börsenwert und bilanzielles Eigenkapital', 'Kurs und Umsatz', 'Kurs und Dividende'], correct: 0, explain: 'Ein KBV unter 1 heißt: Die Börse bewertet das Unternehmen niedriger als sein Eigenkapital in der Bilanz.', lex: 'kgv' },
+    { q: 'Was bewirkt ein Hebel von 5 bei einem Hebelprodukt?', options: ['Gewinne werden verfünffacht, Verluste bleiben begrenzt', 'Die Dividende wird verfünffacht', 'Kursbewegungen des Basiswerts wirken etwa fünffach — in beide Richtungen'], correct: 2, explain: '2 % Minus beim Basiswert werden so zu etwa 10 % Minus — Totalverluste sind möglich.', lex: 'hebel' },
+    { q: 'Was ist der Survivorship Bias?', options: ['Eine Verzerrung, weil gescheiterte Fonds oder Firmen in der Statistik fehlen', 'Die Angst, Verluste zu realisieren', 'Das Nachahmen anderer Anleger'], correct: 0, explain: 'Wer nur die "Überlebenden" betrachtet, überschätzt die durchschnittliche Rendite.' },
+    { q: 'Was bezeichnet "Verlustaversion"?', options: ['Ein gesetzliches Verbot von Verlustgeschäften', 'Verluste schmerzen stärker, als gleich hohe Gewinne freuen', 'Das komplette Meiden aller Risiken'], correct: 1, explain: 'Die Verhaltensökonomie zeigt: Deshalb halten viele Anleger Verlierer-Aktien zu lange.' },
+    { q: 'Was ist die Vorabpauschale bei thesaurierenden Fonds in Deutschland?', options: ['Eine Gebühr beim Kauf', 'Eine Steuerrückerstattung', 'Ein fiktiver Mindestertrag, der versteuert wird, obwohl nichts ausgeschüttet wurde'], correct: 2, explain: 'Sie wird jährlich berechnet und mit dem Sparerpauschbetrag verrechnet; beim Verkauf wird sie angerechnet.', lex: 'thesaurierend' },
+    { q: 'Was ist der Streubesitz ("Free Float") einer Aktie?', options: ['Der Anteil der Aktien, der frei an der Börse gehandelt wird', 'Aktien, die kostenlos verteilt werden', 'Die Schwankungsbreite des Kurses'], correct: 0, explain: 'Aktien großer Ankeraktionäre zählen nicht dazu. Viele Indizes gewichten nach dem Streubesitz.', lex: 'marktkapitalisierung' },
+    { q: 'Was bezeichnet der "Maximum Drawdown"?', options: ['Die höchste Dividende', 'Den größten Rückgang vom Höchststand bis zum Tiefpunkt', 'Die maximale Ordergröße'], correct: 1, explain: 'Er zeigt, welchen Verlust man im schlimmsten Fall zwischenzeitlich aushalten musste.', lex: 'volatilitaet' },
+    { q: 'Womit wird die Volatilität in der Finanzwelt meist gemessen?', options: ['Mit der Durchschnittsrendite', 'Mit der TER', 'Mit der Standardabweichung der Renditen'], correct: 2, explain: 'Je größer die Standardabweichung, desto stärker streuen die Renditen um ihren Mittelwert.', lex: 'volatilitaet' },
   ],
 };
+const QUIZ_ROUND_SIZE = 10;
+
+function shuffled(list) {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// Zufällige Fragen, Antworten in zufälliger Reihenfolge — "correct" wird auf die neue Position umgerechnet.
+function drawQuizQuestions(levelId) {
+  return shuffled(QUIZ_DATA[levelId]).slice(0, QUIZ_ROUND_SIZE).map(question => {
+    const order = shuffled(question.options.map((_, i) => i));
+    return {
+      ...question,
+      options: order.map(i => question.options[i]),
+      correct: order.indexOf(question.correct),
+    };
+  });
+}
 
 function loadLearnBest() {
   try {
@@ -1029,7 +1465,7 @@ function renderLevels() {
   const list = document.getElementById('learnLevelList');
   list.innerHTML = '';
   LEVELS.forEach(level => {
-    const total = QUIZ_DATA[level.id].length;
+    const total = Math.min(QUIZ_ROUND_SIZE, QUIZ_DATA[level.id].length);
     const best = learnBest[level.id] || 0;
     const li = document.createElement('li');
     li.className = 'level-row';
@@ -1038,7 +1474,7 @@ function renderLevels() {
         <span class="menu-icon">${level.icon}</span>
         <span class="menu-text">
           <span class="menu-label">${level.name}</span>
-          <span class="menu-sub">${level.desc} · ${total} Fragen · ${level.points} Punkte/Antwort</span>
+          <span class="menu-sub">${level.desc} · ${total} von ${QUIZ_DATA[level.id].length} Fragen · ${level.points} Punkte/Antwort</span>
         </span>
         <span class="menu-arrow">${best > 0 ? `🏆 ${best}` : '→'}</span>
       </button>
@@ -1053,7 +1489,7 @@ function renderLevels() {
 function startQuiz(levelId) {
   quiz = {
     levelId,
-    questions: QUIZ_DATA[levelId],
+    questions: drawQuizQuestions(levelId),
     index: 0,
     score: 0,
     lives: QUIZ_START_LIVES,
@@ -1120,6 +1556,13 @@ function selectAnswer(i) {
 
   const explanationEl = document.getElementById('quizExplanation');
   explanationEl.textContent = (correct ? '✅ Richtig! ' : '❌ Leider falsch. ') + question.explain;
+  if (question.lex) {
+    const lexBtn = document.createElement('button');
+    lexBtn.className = 'link-btn quiz-lex-link';
+    lexBtn.dataset.lex = question.lex;
+    lexBtn.textContent = '📖 Mehr dazu im Lexikon';
+    explanationEl.append(' ', lexBtn);
+  }
   explanationEl.classList.remove('hidden');
   explanationEl.classList.add(correct ? 'correct' : 'wrong');
 
@@ -1168,6 +1611,208 @@ function finishQuiz() {
 
 document.getElementById('resultRetry').addEventListener('click', () => startQuiz(quiz.levelId));
 document.getElementById('resultBack').addEventListener('click', resetLearnView);
+
+// --- Sparplan-Rechner ---
+
+const SP_INFLATION = 0.02;
+const SP_MILESTONE_STEP = 5;
+
+const spEls = {
+  rate: document.getElementById('spRate'),
+  start: document.getElementById('spStart'),
+  years: document.getElementById('spYears'),
+  ret: document.getElementById('spReturn'),
+  inflation: document.getElementById('spInflation'),
+  rateOut: document.getElementById('spRateOut'),
+  startOut: document.getElementById('spStartOut'),
+  yearsOut: document.getElementById('spYearsOut'),
+  retOut: document.getElementById('spReturnOut'),
+  label: document.getElementById('spResultLabel'),
+  final: document.getElementById('spFinal'),
+  multiple: document.getElementById('spMultiple'),
+  paid: document.getElementById('spPaid'),
+  gain: document.getElementById('spGain'),
+  milestones: document.getElementById('spMilestones'),
+};
+const spCtx = document.getElementById('spChart').getContext('2d');
+
+function formatEuroRound(n) {
+  return Math.round(n).toLocaleString('de-DE') + ' €';
+}
+
+// Monatliche Einzahlung zu Monatsbeginn, monatliche Verzinsung mit dem zum Jahreszins passenden Monatszins.
+// Mit Inflation wird der Wert in heutige Kaufkraft umgerechnet; die Einzahlungen bleiben nominal (so viel zahlst du ja tatsächlich ein).
+function computeSparplan(rate, start, years, annualReturn, inflation) {
+  const monthly = Math.pow(1 + annualReturn, 1 / 12) - 1;
+  let value = start;
+  let paid = start;
+  const points = [{ month: 0, value, paid }];
+  for (let m = 1; m <= years * 12; m++) {
+    value = (value + rate) * (1 + monthly);
+    paid += rate;
+    const real = inflation ? value / Math.pow(1 + SP_INFLATION, m / 12) : value;
+    points.push({ month: m, value: real, paid });
+  }
+  return points;
+}
+
+function drawSparplanChart(points) {
+  const c = spCtx;
+  const W = c.canvas.width;
+  const H = c.canvas.height;
+  const padL = 12, padR = 12, padT = 40, padB = 40;
+  c.clearRect(0, 0, W, H);
+
+  const maxY = Math.max(...points.map(p => Math.max(p.value, p.paid))) * 1.05 || 1;
+  const last = points[points.length - 1].month || 1;
+  const toX = m => padL + (m / last) * (W - padL - padR);
+  const toY = v => H - padB - (v / maxY) * (H - padT - padB);
+
+  function area(key, fill, stroke) {
+    const grad = c.createLinearGradient(0, padT, 0, H - padB);
+    grad.addColorStop(0, fill);
+    grad.addColorStop(1, fill.replace(/[\d.]+\)$/, '0.02)'));
+    c.beginPath();
+    points.forEach((p, i) => (i ? c.lineTo(toX(p.month), toY(p[key])) : c.moveTo(toX(p.month), toY(p[key]))));
+    c.lineTo(toX(last), H - padB);
+    c.lineTo(toX(0), H - padB);
+    c.closePath();
+    c.fillStyle = grad;
+    c.fill();
+    c.beginPath();
+    points.forEach((p, i) => (i ? c.lineTo(toX(p.month), toY(p[key])) : c.moveTo(toX(p.month), toY(p[key]))));
+    c.lineWidth = 3;
+    c.strokeStyle = stroke;
+    c.shadowColor = stroke;
+    c.shadowBlur = 8;
+    c.stroke();
+    c.shadowBlur = 0;
+  }
+
+  area('value', 'rgba(52, 211, 153, 0.35)', '#34d399');
+  area('paid', 'rgba(96, 165, 250, 0.35)', '#60a5fa');
+
+  c.fillStyle = '#8d94ac';
+  c.font = '600 22px Outfit, sans-serif';
+  c.textBaseline = 'alphabetic';
+  const years = last / 12;
+  const step = years > 20 ? 10 : years > 8 ? 5 : years > 3 ? 2 : 1;
+  for (let y = 0; y <= years; y += step) {
+    const x = toX(y * 12);
+    c.textAlign = y === 0 ? 'left' : x > W - 60 ? 'right' : 'center';
+    c.fillText(y === 0 ? 'heute' : `${y} J.`, x, H - 10);
+  }
+  c.textAlign = 'left';
+  c.fillText(formatEuroRound(maxY / 1.05), padL, 26);
+}
+
+function renderSparplan() {
+  const rate = Number(spEls.rate.value);
+  const start = Number(spEls.start.value);
+  const years = Number(spEls.years.value);
+  const ret = Number(spEls.ret.value) / 100;
+  const inflation = spEls.inflation.checked;
+
+  spEls.rateOut.textContent = formatEuroRound(rate);
+  spEls.startOut.textContent = formatEuroRound(start);
+  spEls.yearsOut.textContent = years === 1 ? '1 Jahr' : `${years} Jahre`;
+  spEls.retOut.textContent = `${(ret * 100).toLocaleString('de-DE')} %`;
+
+  const points = computeSparplan(rate, start, years, ret, inflation);
+  const end = points[points.length - 1];
+  const gain = end.value - end.paid;
+  const gainPct = end.paid > 0 ? (gain / end.paid) * 100 : 0;
+
+  spEls.label.textContent = `Nach ${years === 1 ? 'einem Jahr' : `${years} Jahren`} hättest du etwa${inflation ? ' (in heutiger Kaufkraft)' : ''}`;
+  spEls.final.textContent = formatEuroRound(end.value);
+  spEls.multiple.textContent = `${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(0)} % gegenüber deinen Einzahlungen`;
+  spEls.multiple.style.color = gain > 0 ? 'var(--green)' : gain < 0 ? 'var(--red)' : '';
+  spEls.paid.textContent = formatEuroRound(end.paid);
+  spEls.gain.textContent = (gain >= 0 ? '+' : '') + formatEuroRound(gain);
+
+  spEls.milestones.innerHTML = '';
+  const marks = [];
+  for (let y = SP_MILESTONE_STEP; y < years; y += SP_MILESTONE_STEP) marks.push(y);
+  marks.push(years);
+  marks.forEach(y => {
+    const p = points[y * 12];
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="sp-ms-year">${y === 1 ? '1 Jahr' : `${y} Jahre`}</span>
+      <span class="sp-ms-value">${formatEuroRound(p.value)}</span>
+      <span class="sp-ms-paid">eingezahlt ${formatEuroRound(p.paid)}</span>`;
+    spEls.milestones.appendChild(li);
+  });
+
+  drawSparplanChart(points);
+}
+
+[spEls.rate, spEls.start, spEls.years, spEls.ret].forEach(el => el.addEventListener('input', renderSparplan));
+spEls.inflation.addEventListener('change', renderSparplan);
+
+// --- Lexikon ---
+
+const lexEntries = [...document.querySelectorAll('.lex-entry')];
+const lexSearch = document.getElementById('lexSearch');
+const lexEmpty = document.getElementById('lexEmpty');
+
+function filterLexikon() {
+  const q = lexSearch.value.trim().toLowerCase();
+  let shown = 0;
+  lexEntries.forEach(entry => {
+    const hit = !q || entry.textContent.toLowerCase().includes(q);
+    entry.classList.toggle('hidden', !hit);
+    if (hit) shown++;
+  });
+  lexEmpty.classList.toggle('hidden', shown > 0);
+}
+
+function resetLexikon() {
+  lexSearch.value = '';
+  filterLexikon();
+}
+
+// Öffnet einen Eintrag; "Zurück" führt danach in die Ansicht, aus der man kam (z. B. mitten ins Quiz).
+function openLexikon(id) {
+  const entry = document.getElementById('lex-' + id);
+  if (!entry) return;
+  const current = [...views].find(v => !v.classList.contains('hidden'));
+  const returnTo = current ? (current.id === 'lexikon-view' ? lexReturnView : current.id) : null;
+  if (!current || current.id !== 'lexikon-view') openView('lexikon-view');
+  else resetLexikon();
+  lexReturnView = returnTo;
+  entry.classList.remove('lex-highlight');
+  void entry.offsetWidth;
+  entry.classList.add('lex-highlight');
+  entry.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
+lexSearch.addEventListener('input', filterLexikon);
+
+// Schlagwort-Treffer wie in scripts/update_news.py: Teilstring, ein "$" am Ende verlangt ein ganzes Wort.
+// Als Funktion (hoisted) statt Konstante, weil renderNews() schon weiter oben in der Datei läuft.
+function lexMatchers() {
+  lexMatchers.cache = lexMatchers.cache || [...document.querySelectorAll('.lex-entry')]
+  .map(entry => ({
+    id: entry.id.replace(/^lex-/, ''),
+    title: entry.querySelector('h3').textContent,
+    patterns: (entry.dataset.match || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean),
+  }))
+  .filter(m => m.patterns.length);
+  return lexMatchers.cache;
+}
+
+function lexTermsFor(text) {
+  const lower = text.toLowerCase();
+  return lexMatchers().filter(m => m.patterns.some(p => {
+    if (!p.endsWith('$')) return lower.includes(p);
+    const word = p.slice(0, -1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(^|[^\\p{L}\\p{N}])${word}($|[^\\p{L}\\p{N}])`, 'u').test(lower);
+  }));
+}
+
+// Direktlinks wie https://boersen-ratespiel.github.io/#challenge öffnen gleich die passende Ansicht.
+const initialView = [...views].find(v => v.dataset.hash && '#' + v.dataset.hash === location.hash);
+if (initialView) openView(initialView.id);
 
 // --- PWA: Service Worker ---
 

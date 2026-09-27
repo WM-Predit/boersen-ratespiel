@@ -51,6 +51,14 @@
 
     <p class="menu-eyebrow">Wähle einen Bereich</p>
     <nav id="menu" class="menu">
+      <button class="menu-item accent-daily menu-featured" data-view="daily-view">
+        <span class="menu-icon">🗓️</span>
+        <span class="menu-text">
+          <span class="menu-label">Tages-Challenge <span class="menu-new">NEU</span></span>
+          <span id="dailyMenuSub" class="menu-sub">Neu: 5 Kursverläufe, für alle gleich</span>
+        </span>
+        <span class="menu-arrow">→</span>
+      </button>
       <button class="menu-item accent-blue" data-view="news-view">
         <span class="menu-icon">📰</span>
         <span class="menu-text">
@@ -83,16 +91,25 @@
         </span>
         <span class="menu-arrow">→</span>
       </button>
-      <button class="menu-item" disabled>
-        <span class="menu-icon">🔒</span>
+      <button class="menu-item accent-sparplan" data-view="sparplan-view">
+        <span class="menu-icon">🌱</span>
         <span class="menu-text">
-          <span class="menu-label">Weitere Spiele</span>
-          <span class="menu-sub">Bald verfügbar</span>
+          <span class="menu-label">Sparplan-Rechner</span>
+          <span class="menu-sub">Was aus kleinen Beträgen werden kann</span>
         </span>
+        <span class="menu-arrow">→</span>
+      </button>
+      <button class="menu-item accent-lexikon" data-view="lexikon-view">
+        <span class="menu-icon">📖</span>
+        <span class="menu-text">
+          <span class="menu-label">Börsen-Lexikon</span>
+          <span class="menu-sub">Fachbegriffe einfach erklärt</span>
+        </span>
+        <span class="menu-arrow">→</span>
       </button>
     </nav>
 
-    <section id="news-view" class="view hidden">
+    <section id="news-view" class="view hidden" data-hash="news">
       <button class="back-btn">← Zurück</button>
 
       <div class="ticker" data-label="📰 AKTUELL">
@@ -117,11 +134,12 @@
           <button id="newsShuffle" class="mini-btn">🔀 Neue Meldungen</button>
         </div>
         <ul id="newsList" class="info-list news-feed"></ul>
+        <div id="newsTerms" class="news-terms hidden"></div>
         <p id="newsNote" class="panel-note"></p>
       </div>
     </section>
 
-    <section id="learn-view" class="view hidden">
+    <section id="learn-view" class="view hidden" data-hash="lernen">
       <button class="back-btn">← Zurück</button>
 
       <div id="learnLevels" class="quiz-levels">
@@ -162,7 +180,7 @@
       </div>
     </section>
 
-    <section id="depot-view" class="view hidden">
+    <section id="depot-view" class="view hidden" data-hash="depot">
       <button class="back-btn">← Zurück</button>
 
       <div class="depot-hero">
@@ -209,7 +227,7 @@
       <p class="hint depot-reset-hint">Etwas verklickt? <button id="depotReset" class="link-btn">Depot zurücksetzen</button></p>
     </section>
 
-    <section id="game-view" class="view hidden">
+    <section id="game-view" class="view hidden" data-hash="spiel">
       <button class="back-btn">← Zurück</button>
 
       <div class="stats">
@@ -234,6 +252,282 @@
       </div>
 
       <p class="hint">Hinweis: Die Kursverläufe sind zufällig simuliert (kein echtes Marktdaten-Feed) — nur zum Üben deines Gefühls für Trends, Volatilität und Rauschen.</p>
+    </section>
+
+    <section id="daily-view" class="view hidden" data-hash="challenge">
+      <button class="back-btn">← Zurück</button>
+
+      <div id="dailyPlay">
+        <div class="stats">
+          <div class="stat"><span class="label">Kurs</span><span id="dailyRound" class="value">1/5</span></div>
+          <div class="stat"><span class="label">Treffer</span><span id="dailyScore" class="value">0</span></div>
+          <div class="stat"><span class="label">Tage in Folge</span><span id="dailyStreak" class="value">0</span></div>
+        </div>
+
+        <div id="dailyDots" class="daily-dots" aria-hidden="true"></div>
+
+        <div class="chart-wrap">
+          <canvas id="dailyChart" width="800" height="360"></canvas>
+          <div id="dailyBanner" class="banner hidden"></div>
+        </div>
+
+        <div class="controls">
+          <button id="dailyUp" class="btn up">📈 Rauf</button>
+          <button id="dailyDown" class="btn down">📉 Runter</button>
+          <button id="dailyNext" class="btn next hidden">Nächster Kurs →</button>
+        </div>
+
+        <p class="hint">Jeden Tag 5 neue Kursverläufe — für alle Spieler gleich. Kein Zeitdruck, aber nur ein Versuch pro Tag. Die Kurse sind simuliert, keine echten Marktdaten.</p>
+      </div>
+
+      <div id="dailyResult" class="hidden">
+        <div class="panel result-panel">
+          <h2 id="dailyResultTitle">Geschafft!</h2>
+          <div id="dailyResultEmojis" class="daily-emojis"></div>
+          <p id="dailyResultSummary" class="panel-note"></p>
+          <div class="controls">
+            <button id="dailyShare" class="btn next" data-goatcounter-click="daily-share">📤 Ergebnis teilen</button>
+          </div>
+          <p id="dailyShareStatus" class="daily-share-status" role="status"></p>
+          <p id="dailyCountdown" class="panel-note"></p>
+        </div>
+        <p class="hint">Bis morgen: <a class="link-btn" href="#spiel" data-goto="game-view">im freien Spiel „Rauf oder Runter“ weiterüben</a></p>
+      </div>
+    </section>
+
+    <section id="sparplan-view" class="view hidden" data-hash="sparplan">
+      <button class="back-btn">← Zurück</button>
+
+      <div class="panel sp-panel">
+        <h2>🌱 Sparplan-Rechner</h2>
+        <p class="panel-note quiz-intro">Stell ein, wie viel du jeden Monat anlegst, und sieh, was daraus mit Zinseszins werden kann.</p>
+
+        <div class="sp-field">
+          <label for="spRate"><span>Monatliche Sparrate</span><output id="spRateOut" for="spRate">50 €</output></label>
+          <input type="range" id="spRate" min="10" max="1000" step="10" value="50">
+        </div>
+        <div class="sp-field">
+          <label for="spStart"><span>Startbetrag (einmalig)</span><output id="spStartOut" for="spStart">0 €</output></label>
+          <input type="range" id="spStart" min="0" max="20000" step="500" value="0">
+        </div>
+        <div class="sp-field">
+          <label for="spYears"><span>Laufzeit</span><output id="spYearsOut" for="spYears">20 Jahre</output></label>
+          <input type="range" id="spYears" min="1" max="40" step="1" value="20">
+        </div>
+        <div class="sp-field">
+          <label for="spReturn"><span>Angenommene Rendite pro Jahr</span><output id="spReturnOut" for="spReturn">5 %</output></label>
+          <input type="range" id="spReturn" min="0" max="10" step="0.5" value="5">
+        </div>
+        <label class="sp-check">
+          <input type="checkbox" id="spInflation">
+          <span>In heutiger Kaufkraft anzeigen (2 % Inflation pro Jahr abgezogen)</span>
+        </label>
+      </div>
+
+      <div class="depot-hero sp-hero">
+        <span id="spResultLabel" class="depot-hero-label">Nach 20 Jahren hättest du etwa</span>
+        <span id="spFinal" class="depot-hero-value">0 €</span>
+        <span id="spMultiple" class="depot-hero-return">0 %</span>
+      </div>
+
+      <div class="depot-substats">
+        <div class="stat"><span class="label">Eingezahlt</span><span id="spPaid" class="value">0 €</span></div>
+        <div class="stat"><span class="label">Wertzuwachs</span><span id="spGain" class="value">0 €</span></div>
+      </div>
+
+      <div class="chart-wrap sp-chart-wrap">
+        <canvas id="spChart" width="800" height="320" role="img" aria-label="Verlauf von Einzahlungen und Depotwert über die Laufzeit"></canvas>
+      </div>
+      <div class="sp-legend">
+        <span><i class="sp-swatch paid"></i> Eingezahlt</span>
+        <span><i class="sp-swatch gain"></i> Wert inkl. Zinseszins</span>
+      </div>
+
+      <div class="panel">
+        <h2>📊 Zwischenstände</h2>
+        <ul id="spMilestones" class="sp-milestones"></ul>
+        <p class="panel-note">Beispielrechnung mit gleichbleibender Rendite, monatlicher Einzahlung und monatlicher Verzinsung. Echte Kurse schwanken — auch Verluste sind möglich, eine bestimmte Rendite ist nie garantiert. Kosten und Steuern sind nicht berücksichtigt. Keine Anlageberatung. Was hinter den Begriffen steckt: <a class="link-btn" href="#lexikon" data-lex="sparplan">Sparplan</a>, <a class="link-btn" href="#lexikon" data-lex="zinseszins">Zinseszins</a>, <a class="link-btn" href="#lexikon" data-lex="cost-average">Cost-Average-Effekt</a>.</p>
+      </div>
+
+      <div class="panel broker-cta">
+        <span class="broker-cta-badge">Werbung</span>
+        <h2 class="broker-cta-title">🌱 Sparplan echt starten?</h2>
+        <p class="broker-cta-text">Viele Neobroker bieten ETF-Sparpläne schon ab kleinen Beträgen an. Wenn du soweit bist, kannst du hier ein Depot eröffnen.</p>
+        <div class="broker-cta-links">
+          <a href="https://www.traderepublic.com/" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="broker-traderepublic-sparplan">Trade Republic <span class="broker-cta-arrow">→</span></a>
+          <a href="https://de.scalable.capital/" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="broker-scalablecapital-sparplan">Scalable Capital <span class="broker-cta-arrow">→</span></a>
+        </div>
+        <p class="broker-cta-disclaimer">Partnerlinks: Meldest du dich über einen dieser Links an, erhalten wir ggf. eine Provision — für dich ändert sich nichts am Preis. Keine Anlageberatung, keine Empfehlung für einen bestimmten Anbieter oder ein bestimmtes Produkt.</p>
+      </div>
+
+      <p class="hint">Lieber erst üben? <a class="link-btn" href="#depot" data-goto="depot-view">Zum Musterdepot</a></p>
+    </section>
+
+    <section id="lexikon-view" class="view hidden" data-hash="lexikon">
+      <button class="back-btn">← Zurück</button>
+
+      <div class="panel lex-panel">
+        <h2>📖 Börsen-Lexikon</h2>
+        <input type="search" id="lexSearch" class="lex-search" placeholder="Begriff suchen, z. B. ETF oder Inflation" aria-label="Lexikon durchsuchen" autocomplete="off">
+        <p id="lexEmpty" class="panel-note hidden">Kein Begriff gefunden. Versuch es mit einem anderen Wort.</p>
+
+        <div id="lexList" class="lex-list">
+          <article class="lex-entry" id="lex-aktie" data-match="aktie">
+            <h3>Aktie</h3>
+            <p>Ein Anteilsschein an einem Unternehmen. Wer eine Aktie kauft, wird Miteigentümer: Er ist am Gewinn beteiligt (z. B. über die <a class="link-btn" href="#lexikon" data-lex="dividende">Dividende</a>) und darf auf der Hauptversammlung abstimmen. Steigt der Wert des Unternehmens, steigt meist auch der Kurs — umgekehrt genauso.</p>
+          </article>
+          <article class="lex-entry" id="lex-anleihe" data-match="anleihe,bond$,bonds$">
+            <h3>Anleihe</h3>
+            <p>Ein Kredit, den du einem Staat oder Unternehmen gibst. Dafür bekommst du in der Regel feste Zinsen (Kupon) und am Ende der Laufzeit dein Geld zurück — sofern der Schuldner zahlen kann. Steigen die Marktzinsen, fallen die Kurse bestehender Anleihen, weil neue Anleihen dann mehr Zins bieten.</p>
+          </article>
+          <article class="lex-entry" id="lex-arbeitsmarkt" data-match="arbeitslos,erwerbstätig,erwerbslos,beschäftigte,unemployment,employment">
+            <h3>Arbeitsmarktdaten</h3>
+            <p>Zahlen wie Erwerbstätige, Arbeitslosenquote oder neu geschaffene Stellen. Sie zeigen, wie gut die Wirtschaft läuft: Viele Jobs bedeuten meist mehr Einkommen und Konsum. Notenbanken beobachten den Arbeitsmarkt genau, weil ein sehr enger Arbeitsmarkt Löhne und damit Preise antreiben kann.</p>
+          </article>
+          <article class="lex-entry" id="lex-aussenhandel" data-match="außenhandel,export,import$,importe,trade balance">
+            <h3>Außenhandel</h3>
+            <p>Der Handel mit anderen Ländern: Exporte (Verkäufe ins Ausland) und Importe (Käufe aus dem Ausland). Für eine Exportnation wie Deutschland sind die Exportzahlen ein wichtiger Hinweis darauf, wie gefragt heimische Produkte weltweit sind.</p>
+          </article>
+          <article class="lex-entry" id="lex-baerenmarkt" data-match="bärenmarkt">
+            <h3>Bärenmarkt</h3>
+            <p>Eine längere Phase mit fallenden Kursen. Als Faustregel spricht man davon, wenn ein Index mehr als 20 % unter seinem letzten Hoch liegt. Das Bild: Der Bär schlägt mit der Tatze von oben nach unten. Das Gegenteil ist der <a class="link-btn" href="#lexikon" data-lex="bullenmarkt">Bullenmarkt</a>.</p>
+          </article>
+          <article class="lex-entry" id="lex-bip" data-match="bip$,bruttoinlandsprodukt,wirtschaftsleistung,gdp$">
+            <h3>Bruttoinlandsprodukt (BIP)</h3>
+            <p>Der Wert aller Waren und Dienstleistungen, die in einem Land in einem Zeitraum hergestellt werden. Das BIP ist das wichtigste Maß für die Wirtschaftsleistung. Schrumpft es zwei Quartale in Folge, spricht man oft von einer (technischen) Rezession.</p>
+          </article>
+          <article class="lex-entry" id="lex-blue-chip" data-match="">
+            <h3>Blue Chip</h3>
+            <p>Eine Aktie eines großen, etablierten und finanzstarken Unternehmens — typischerweise Mitglied in großen Indizes wie dem <a class="link-btn" href="#lexikon" data-lex="dax">DAX</a>. Der Name kommt vom Poker: Die blauen Chips hatten den höchsten Wert.</p>
+          </article>
+          <article class="lex-entry" id="lex-boerse" data-match="börse">
+            <h3>Börse</h3>
+            <p>Ein Marktplatz, auf dem Wertpapiere wie Aktien, Anleihen oder ETFs gehandelt werden. Der Preis (Kurs) entsteht aus Angebot und Nachfrage: Wollen mehr Menschen kaufen als verkaufen, steigt der Kurs. Die größte deutsche Börse ist die Frankfurter Wertpapierbörse mit dem Handelssystem Xetra.</p>
+          </article>
+          <article class="lex-entry" id="lex-broker" data-match="">
+            <h3>Broker</h3>
+            <p>Ein Anbieter, über den du Wertpapiere kaufen und verkaufen kannst — früher meist die Hausbank, heute oft günstige Online- oder Neobroker per App. Der Broker leitet deine <a class="link-btn" href="#lexikon" data-lex="order">Order</a> an die Börse weiter und verwahrt die Wertpapiere in deinem <a class="link-btn" href="#lexikon" data-lex="depot">Depot</a>.</p>
+          </article>
+          <article class="lex-entry" id="lex-bullenmarkt" data-match="bullenmarkt">
+            <h3>Bullenmarkt</h3>
+            <p>Eine längere Phase mit steigenden Kursen. Das Bild: Der Bulle stößt mit den Hörnern von unten nach oben. Das Gegenteil ist der <a class="link-btn" href="#lexikon" data-lex="baerenmarkt">Bärenmarkt</a>.</p>
+          </article>
+          <article class="lex-entry" id="lex-cost-average" data-match="">
+            <h3>Cost-Average-Effekt</h3>
+            <p>Wer regelmäßig einen festen Betrag investiert (z. B. per <a class="link-btn" href="#lexikon" data-lex="sparplan">Sparplan</a>), kauft bei niedrigen Kursen automatisch mehr Anteile und bei hohen weniger. Das glättet den durchschnittlichen Einstiegspreis und nimmt die Frage nach dem „richtigen Zeitpunkt" ab. Eine höhere Rendite ist damit aber nicht garantiert.</p>
+          </article>
+          <article class="lex-entry" id="lex-dax" data-match="dax$">
+            <h3>DAX</h3>
+            <p>Der Deutsche Aktienindex — der wichtigste deutsche <a class="link-btn" href="#lexikon" data-lex="index">Aktienindex</a>. Er enthält seit 2021 die 40 größten börsennotierten Unternehmen Deutschlands (vorher 30). Der DAX ist ein Performance-Index: Dividenden werden rechnerisch wieder angelegt.</p>
+          </article>
+          <article class="lex-entry" id="lex-depot" data-match="">
+            <h3>Depot</h3>
+            <p>Ein Konto, auf dem deine Wertpapiere verwahrt werden — so wie ein Girokonto für Geld. Ohne Depot kannst du keine Aktien oder ETFs kaufen. In der App kannst du das im <a class="link-btn" href="#depot" data-goto="depot-view">Musterdepot</a> ohne echtes Geld ausprobieren.</p>
+          </article>
+          <article class="lex-entry" id="lex-diversifikation" data-match="">
+            <h3>Diversifikation</h3>
+            <p>Risikostreuung: das Geld auf viele verschiedene Anlagen, Branchen und Länder verteilen, statt „alle Eier in einen Korb zu legen". Fällt eine Anlage stark, trifft das dann nur einen kleinen Teil des Vermögens. Ein einfacher Weg dazu ist ein breit gestreuter <a class="link-btn" href="#lexikon" data-lex="etf">ETF</a>.</p>
+          </article>
+          <article class="lex-entry" id="lex-dividende" data-match="dividende">
+            <h3>Dividende</h3>
+            <p>Der Teil des Gewinns, den ein Unternehmen an seine Aktionäre ausschüttet — meist einmal im Jahr, manche Unternehmen zahlen auch quartalsweise. Über die Höhe entscheidet die Hauptversammlung. Eine Dividende ist nie garantiert und kann gekürzt oder gestrichen werden.</p>
+          </article>
+          <article class="lex-entry" id="lex-erzeugerpreise" data-match="erzeugerpreis,producer price">
+            <h3>Erzeugerpreise</h3>
+            <p>Die Preise, die Hersteller für ihre Produkte verlangen, bevor diese im Handel landen. Steigen die Erzeugerpreise, kommt das oft mit etwas Verzögerung auch bei den Verbraucherpreisen an. Sie gelten deshalb als Frühindikator für die <a class="link-btn" href="#lexikon" data-lex="inflation">Inflation</a>.</p>
+          </article>
+          <article class="lex-entry" id="lex-etf" data-match="etf$,etfs$">
+            <h3>ETF</h3>
+            <p>Exchange Traded Fund — ein börsengehandelter <a class="link-btn" href="#lexikon" data-lex="fonds">Fonds</a>, der meist einfach einen <a class="link-btn" href="#lexikon" data-lex="index">Index</a> nachbildet, z. B. den <a class="link-btn" href="#lexikon" data-lex="msci-world">MSCI World</a>. Mit einem einzigen ETF-Anteil bist du an Hunderten Unternehmen beteiligt. ETFs sind meist deutlich günstiger als aktiv gemanagte Fonds (siehe <a class="link-btn" href="#lexikon" data-lex="ter">TER</a>).</p>
+          </article>
+          <article class="lex-entry" id="lex-ezb" data-match="ezb$,ecb$,europäische zentralbank,european central bank">
+            <h3>EZB (Europäische Zentralbank)</h3>
+            <p>Die Notenbank der Euro-Länder mit Sitz in Frankfurt am Main. Ihre wichtigste Aufgabe ist stabile Preise: Sie strebt mittelfristig eine <a class="link-btn" href="#lexikon" data-lex="inflation">Inflation</a> von 2 % an. Ihr wichtigstes Werkzeug sind die <a class="link-btn" href="#lexikon" data-lex="leitzins">Leitzinsen</a>. Das US-Gegenstück ist die Federal Reserve („Fed").</p>
+          </article>
+          <article class="lex-entry" id="lex-fonds" data-match="">
+            <h3>Fonds</h3>
+            <p>Ein großer Topf, in dem das Geld vieler Anleger gemeinsam angelegt wird — etwa in Aktien oder Anleihen. Bei aktiven Fonds wählt ein Fondsmanager die Wertpapiere aus, bei passiven Fonds (<a class="link-btn" href="#lexikon" data-lex="etf">ETFs</a>) wird einfach ein Index nachgebildet. Fondsvermögen ist Sondervermögen und bleibt auch geschützt, wenn die Fondsgesellschaft pleitegeht.</p>
+          </article>
+          <article class="lex-entry" id="lex-hebel" data-match="">
+            <h3>Hebel</h3>
+            <p>Hebelprodukte (z. B. Optionsscheine, Knock-out-Zertifikate, CFDs) verstärken die Bewegung eines Basiswerts. Bei einem Hebel von 5 wirkt ein Kursplus von 2 % ungefähr wie 10 % — ein Minus von 2 % aber ebenso wie −10 %. Totalverluste sind möglich; die meisten Privatanleger verlieren mit solchen Produkten Geld.</p>
+          </article>
+          <article class="lex-entry" id="lex-index" data-match="">
+            <h3>Index (Aktienindex)</h3>
+            <p>Eine Kennzahl, die die Entwicklung einer Gruppe von Aktien zusammenfasst — z. B. der <a class="link-btn" href="#lexikon" data-lex="dax">DAX</a> für große deutsche oder der <a class="link-btn" href="#lexikon" data-lex="msci-world">MSCI World</a> für große Unternehmen aus Industrieländern. Ein Index zeigt auf einen Blick, wie sich „der Markt" entwickelt.</p>
+          </article>
+          <article class="lex-entry" id="lex-inflation" data-match="inflation,verbraucherpreis,teuerung,consumer price,hicp$">
+            <h3>Inflation</h3>
+            <p>Der allgemeine Anstieg der Preise. Bei 2 % Inflation kostet ein Einkauf für 100 € nach einem Jahr etwa 102 € — dein Geld verliert also an Kaufkraft. Gemessen wird sie meist über den Verbraucherpreisindex. Deshalb zählt bei Geldanlagen die „Realrendite": Rendite minus Inflation.</p>
+          </article>
+          <article class="lex-entry" id="lex-kgv" data-match="">
+            <h3>KGV (Kurs-Gewinn-Verhältnis)</h3>
+            <p>Aktienkurs geteilt durch den Gewinn je Aktie. Ein KGV von 15 heißt: Du zahlst für das Unternehmen das 15-Fache seines Jahresgewinns. Ein niedriges KGV kann auf eine günstige Aktie hindeuten — oder darauf, dass der Markt schlechtere Zeiten erwartet. Verwandt ist das KBV (Kurs-Buchwert-Verhältnis).</p>
+          </article>
+          <article class="lex-entry" id="lex-leerverkauf" data-match="">
+            <h3>Leerverkauf (Short)</h3>
+            <p>Eine Wette auf fallende Kurse: Man leiht sich Aktien, verkauft sie sofort und hofft, sie später günstiger zurückkaufen und zurückgeben zu können. Steigt der Kurs stattdessen, ist der mögliche Verlust theoretisch unbegrenzt.</p>
+          </article>
+          <article class="lex-entry" id="lex-leitzins" data-match="leitzins,zinsentscheid,geldpolitik,interest rate,monetary policy">
+            <h3>Leitzins</h3>
+            <p>Der Zins, zu dem sich Geschäftsbanken bei der Zentralbank Geld leihen oder dort anlegen können. Im Euroraum legt ihn die <a class="link-btn" href="#lexikon" data-lex="ezb">EZB</a> fest. Hohe Leitzinsen verteuern Kredite und bremsen die <a class="link-btn" href="#lexikon" data-lex="inflation">Inflation</a>; niedrige beleben die Wirtschaft. Zinsentscheide bewegen oft die Börsen.</p>
+          </article>
+          <article class="lex-entry" id="lex-marktkapitalisierung" data-match="marktkapitalisierung,börsenwert">
+            <h3>Marktkapitalisierung</h3>
+            <p>Der Börsenwert eines Unternehmens: Aktienkurs × Anzahl aller Aktien. Viele Indizes gewichten ihre Mitglieder danach — große Unternehmen haben dann mehr Einfluss auf den Index als kleine. Der Streubesitz („Free Float") ist der Teil der Aktien, der frei an der Börse gehandelt wird.</p>
+          </article>
+          <article class="lex-entry" id="lex-msci-world" data-match="msci">
+            <h3>MSCI World</h3>
+            <p>Ein Aktienindex mit rund 1.400 großen und mittelgroßen Unternehmen aus 23 Industrieländern. Er ist einer der beliebtesten Indizes für ETF-Sparpläne. Wichtig: Schwellenländer wie China oder Indien sind nicht enthalten, und US-Unternehmen machen einen sehr großen Teil (rund 70 %) aus.</p>
+          </article>
+          <article class="lex-entry" id="lex-order" data-match="">
+            <h3>Order</h3>
+            <p>Ein Kauf- oder Verkaufsauftrag für ein Wertpapier. Eine Market-Order wird sofort zum nächsten verfügbaren Preis ausgeführt. Eine Limit-Order nur zu deinem Wunschpreis oder besser. Eine Stop-Loss-Order verkauft automatisch, wenn der Kurs unter eine festgelegte Marke fällt — um Verluste zu begrenzen.</p>
+          </article>
+          <article class="lex-entry" id="lex-rebalancing" data-match="">
+            <h3>Rebalancing</h3>
+            <p>Das regelmäßige Zurücksetzen des Depots auf die ursprünglich geplante Aufteilung. Beispiel: Geplant sind 70 % Aktien und 30 % Anleihen. Nach einem guten Aktienjahr sind es 80/20 — dann werden Aktien verkauft oder Anleihen nachgekauft, bis wieder 70/30 erreicht ist.</p>
+          </article>
+          <article class="lex-entry" id="lex-rendite" data-match="rendite">
+            <h3>Rendite</h3>
+            <p>Der Ertrag einer Geldanlage, meist in Prozent pro Jahr angegeben — also Kursgewinne plus Zinsen oder Dividenden. Grundregel: Höhere Renditechancen gehen fast immer mit höherem Risiko einher. Wichtig ist auch die Rendite nach Kosten, Steuern und <a class="link-btn" href="#lexikon" data-lex="inflation">Inflation</a>.</p>
+          </article>
+          <article class="lex-entry" id="lex-sparerpauschbetrag" data-match="">
+            <h3>Sparerpauschbetrag</h3>
+            <p>In Deutschland bleiben Kapitalerträge (Zinsen, Dividenden, Kursgewinne) bis 1.000 € pro Person und Jahr steuerfrei (Ehepaare: 2.000 €, Stand seit 2023). Damit das automatisch klappt, erteilt man seiner Bank oder seinem Broker einen Freistellungsauftrag. Darüber fällt Abgeltungsteuer an (25 % plus Solidaritätszuschlag, ggf. Kirchensteuer).</p>
+          </article>
+          <article class="lex-entry" id="lex-sparplan" data-match="">
+            <h3>Sparplan</h3>
+            <p>Du investierst regelmäßig, z. B. monatlich, einen festen Betrag in einen ETF, Fonds oder eine Aktie. Das geht bei vielen Brokern schon mit kleinen Beträgen und nutzt den <a class="link-btn" href="#lexikon" data-lex="cost-average">Cost-Average-Effekt</a> und den <a class="link-btn" href="#lexikon" data-lex="zinseszins">Zinseszins</a>. Rechne es im <a class="link-btn" href="#sparplan" data-goto="sparplan-view">Sparplan-Rechner</a> durch.</p>
+          </article>
+          <article class="lex-entry" id="lex-spread" data-match="">
+            <h3>Spread</h3>
+            <p>Der Unterschied zwischen Kaufkurs (Briefkurs, „Ask") und Verkaufskurs (Geldkurs, „Bid"). Kaufst und verkaufst du sofort wieder, verlierst du genau diesen Spread. Bei viel gehandelten Wertpapieren ist er klein, bei wenig gehandelten größer.</p>
+          </article>
+          <article class="lex-entry" id="lex-tagesgeld" data-match="tagesgeld">
+            <h3>Tagesgeld</h3>
+            <p>Ein verzinstes Konto, über das du jederzeit verfügen kannst. Guthaben bis 100.000 € pro Person und Bank sind in der EU über die gesetzliche Einlagensicherung geschützt. Gut für den Notgroschen — die Zinsen liegen aber oft nur in der Nähe der <a class="link-btn" href="#lexikon" data-lex="inflation">Inflation</a> oder darunter.</p>
+          </article>
+          <article class="lex-entry" id="lex-ter" data-match="">
+            <h3>TER (Gesamtkostenquote)</h3>
+            <p>Total Expense Ratio: die laufenden jährlichen Kosten eines Fonds oder ETFs in Prozent, die automatisch aus dem Fondsvermögen entnommen werden. Breite ETFs liegen oft bei 0,1–0,3 %, aktive Fonds häufig bei 1–2 %. Wie gut ein ETF seinen Index tatsächlich abbildet, zeigt die Tracking Difference.</p>
+          </article>
+          <article class="lex-entry" id="lex-thesaurierend" data-match="">
+            <h3>Thesaurierend / Ausschüttend</h3>
+            <p>Ein ausschüttender Fonds zahlt Dividenden und Zinsen an dich aus. Ein thesaurierender legt sie automatisch wieder an — gut für den <a class="link-btn" href="#lexikon" data-lex="zinseszins">Zinseszins</a>. In Deutschland wird bei thesaurierenden Fonds jährlich trotzdem eine kleine „Vorabpauschale" versteuert, soweit sie nicht vom <a class="link-btn" href="#lexikon" data-lex="sparerpauschbetrag">Sparerpauschbetrag</a> gedeckt ist.</p>
+          </article>
+          <article class="lex-entry" id="lex-volatilitaet" data-match="volatilität,volatility">
+            <h3>Volatilität</h3>
+            <p>Wie stark ein Kurs schwankt, gemessen meist als Standardabweichung der Renditen. Eine volatile Aktie macht große Sprünge nach oben und unten, eine wenig volatile verläuft ruhiger. Im Spiel <a class="link-btn" href="#spiel" data-goto="game-view">Rauf oder Runter</a> kannst du das Rauschen selbst erleben.</p>
+          </article>
+          <article class="lex-entry" id="lex-zinseszins" data-match="">
+            <h3>Zinseszins</h3>
+            <p>Erträge werfen selbst wieder Erträge ab. Beispiel: 1.000 € bei 5 % pro Jahr werden nach einem Jahr 1.050 €, im zweiten Jahr gibt es 5 % auf 1.050 € — also 52,50 €. Je länger die Laufzeit, desto stärker wirkt der Effekt. Probiere es im <a class="link-btn" href="#sparplan" data-goto="sparplan-view">Sparplan-Rechner</a> aus.</p>
+          </article>
+        </div>
+
+        <p class="panel-note">Vereinfachte Erklärungen zum Lernen, Stand 2026 — keine Anlage- oder Steuerberatung.</p>
+      </div>
     </section>
 
     <footer class="app-footer">

@@ -1443,6 +1443,230 @@ a.news-top-link:hover { text-decoration: underline; text-underline-offset: 3px; 
   to { transform: translateY(110vh) rotate(540deg); opacity: 0.9; }
 }
 
+/* Menü: neue Bereiche */
+
+.menu .menu-item:nth-child(5) { animation-delay: 0.33s; }
+.menu .menu-item:nth-child(6) { animation-delay: 0.4s; }
+.menu .menu-item:nth-child(7) { animation-delay: 0.47s; }
+
+.menu-item.accent-daily .menu-icon { background: linear-gradient(135deg, rgba(250,204,21,0.4), rgba(251,113,133,0.3)); }
+.menu-item.accent-sparplan .menu-icon { background: linear-gradient(135deg, rgba(52,211,153,0.35), rgba(96,165,250,0.25)); }
+.menu-item.accent-lexikon .menu-icon { background: linear-gradient(135deg, rgba(96,165,250,0.3), rgba(167,139,250,0.3)); }
+
+.menu-item.menu-featured {
+  border-color: rgba(250, 204, 21, 0.35);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.09), rgba(251, 113, 133, 0.06));
+}
+.menu-item.menu-featured:not(:disabled):hover { border-color: rgba(250, 204, 21, 0.6); }
+
+.menu-new {
+  display: inline-block;
+  vertical-align: 2px;
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #facc15;
+  color: #1a1400;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+/* Tages-Challenge */
+
+.daily-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: -6px 0 14px;
+}
+
+.daily-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--panel-border);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.daily-dot.current { border-color: #facc15; transform: scale(1.15); }
+.daily-dot.hit { background: var(--green); border-color: var(--green); }
+.daily-dot.miss { background: var(--red); border-color: var(--red); }
+
+.daily-emojis {
+  font-size: 2.2rem;
+  letter-spacing: 0.12em;
+  margin: 6px 0 4px;
+}
+
+.daily-share-status {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--green);
+  white-space: pre-line;
+}
+.daily-share-status:empty { display: none; }
+
+/* Sparplan-Rechner */
+
+.sp-panel { margin-bottom: 14px; }
+
+.sp-field { margin-bottom: 16px; }
+
+.sp-field label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.sp-field output {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+.sp-field input[type="range"] {
+  width: 100%;
+  accent-color: var(--green);
+  height: 28px;
+  margin: 0;
+}
+
+.sp-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.sp-check input { accent-color: var(--green); width: 18px; height: 18px; margin: 1px 0 0; flex-shrink: 0; }
+
+.sp-hero .depot-hero-label { text-transform: none; letter-spacing: 0; font-size: 0.85rem; }
+
+.sp-chart-wrap { margin-bottom: 8px; }
+
+.sp-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.sp-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 4px;
+  vertical-align: -1px;
+}
+.sp-swatch.paid { background: var(--blue); }
+.sp-swatch.gain { background: var(--green); }
+
+.sp-milestones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sp-milestones li {
+  display: grid;
+  grid-template-columns: 5.5em 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sp-ms-year { grid-row: 1 / 3; align-self: center; font-weight: 700; color: var(--muted); font-size: 0.85rem; }
+.sp-ms-value { font-weight: 800; font-variant-numeric: tabular-nums; }
+.sp-ms-paid { font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.sp-panel ~ .broker-cta { margin-top: 16px; }
+
+/* Lexikon */
+
+.lex-search {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--panel-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+.lex-search::placeholder { color: var(--muted); }
+.lex-search:focus { outline: none; border-color: rgba(96, 165, 250, 0.6); }
+
+.lex-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lex-entry {
+  padding: 12px 14px;
+  border-left: 3px solid var(--blue);
+  border-radius: 0 12px 12px 0;
+  background: rgba(255, 255, 255, 0.03);
+  scroll-margin: 90px;
+}
+
+.lex-entry h3 { margin: 0 0 4px; font-size: 1rem; font-weight: 800; }
+.lex-entry p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.55; }
+a.link-btn { display: inline; }
+.lex-entry .link-btn { text-decoration-color: rgba(96, 165, 250, 0.5); text-underline-offset: 2px; }
+
+.lex-entry.lex-highlight { animation: lexHighlight 2.4s ease; }
+
+@keyframes lexHighlight {
+  0%, 40% { background: rgba(250, 204, 21, 0.16); border-left-color: #facc15; }
+  100% { background: rgba(255, 255, 255, 0.03); border-left-color: var(--blue); }
+}
+
+/* Lexikon-Verweise in News und Quiz */
+
+.news-terms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.news-terms-label { font-size: 0.78rem; color: var(--muted); font-weight: 700; margin-right: 2px; }
+
+.news-term {
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  color: var(--blue);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.news-term:hover { background: rgba(96, 165, 250, 0.22); }
+
+.quiz-lex-link { font-size: 0.82rem; }
+
 /* Tastatur-Fokus: sichtbarer Ring, nur bei Tastaturbedienung (nicht bei Mausklick) */
 
 :focus-visible {
@@ -1463,6 +1687,17 @@ a.news-top-link:hover { text-decoration: underline; text-underline-offset: 3px; 
     display: inline-block;
     padding: 12px 6px;
   }
+
+  /* Links mitten im Fließtext: größere Tippfläche ohne größeren Zeilenabstand */
+  .lex-entry .link-btn,
+  .panel-note .link-btn,
+  .quiz-explanation .link-btn {
+    display: inline;
+    padding: 10px 4px;
+    margin: -10px -4px;
+  }
+
+  .news-term { min-height: 36px; }
 
   /* Textlinks: Tippfläche vergrößern, ohne dass sich das Layout verschiebt */
   .news-source a,
