@@ -1,0 +1,39 @@
+name: Deploy Pages
+
+# Veröffentlicht die Seite auf GitHub Pages. Nötig, weil der klassische Pages-Build ("Deploy from a branch") nur bei
+# Pushes von Personen läuft: Die stündlichen News-Commits (GITHUB_TOKEN) und Merges über GitHub-Apps lösen dort keinen
+# Neubau aus. Voraussetzung: Settings -> Pages -> Source = "GitHub Actions".
+on:
+  push:
+    branches: [main]
+  workflow_call: # aus update-news.yml, sobald sich news.json/termine.json geändert haben
+  workflow_dispatch: # manuell: Actions-Tab -> "Deploy Pages" -> "Run workflow"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main # beim Aufruf aus update-news.yml den gerade gepushten News-Commit holen, nicht den Stand vom Start
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
