@@ -59,6 +59,14 @@
         </span>
         <span class="menu-arrow">→</span>
       </button>
+      <button class="menu-item accent-lernpfad" data-view="lernpfad-view">
+        <span class="menu-icon">🧭</span>
+        <span class="menu-text">
+          <span class="menu-label">Lernpfad für Einsteiger</span>
+          <span id="lernpfadMenuSub" class="menu-sub">In 6 Schritten zu den Börsen-Basics</span>
+        </span>
+        <span class="menu-arrow">→</span>
+      </button>
       <button class="menu-item accent-blue" data-view="news-view">
         <span class="menu-icon">📰</span>
         <span class="menu-text">
@@ -107,6 +115,22 @@
         </span>
         <span class="menu-arrow">→</span>
       </button>
+      <button class="menu-item accent-erfolge" data-view="erfolge-view">
+        <span class="menu-icon">🏅</span>
+        <span class="menu-text">
+          <span class="menu-label">Erfolge</span>
+          <span id="badgeMenuSub" class="menu-sub">17 Abzeichen zum Sammeln</span>
+        </span>
+        <span class="menu-arrow">→</span>
+      </button>
+      <button class="menu-item accent-broker" data-view="broker-view">
+        <span class="menu-icon">🏦</span>
+        <span class="menu-text">
+          <span class="menu-label">Echtes Depot eröffnen?</span>
+          <span class="menu-sub">Worauf es ankommt · mit Partnerlinks</span>
+        </span>
+        <span class="menu-arrow">→</span>
+      </button>
     </nav>
 
     <section id="news-view" class="view hidden" data-hash="news">
@@ -137,6 +161,8 @@
         <div id="newsTerms" class="news-terms hidden"></div>
         <p id="newsNote" class="panel-note"></p>
       </div>
+
+      <div class="ad-slot hidden" data-slot="news"></div>
     </section>
 
     <section id="learn-view" class="view hidden" data-hash="lernen">
@@ -213,14 +239,35 @@
         <p class="panel-note">Virtuelles Geld, fiktive Kurse (Random Walk) — kein echtes Marktdaten-Feed, keine Anlageberatung.</p>
       </div>
 
+      <div class="panel depot-plan-panel">
+        <h2>🌱 Sparplan üben</h2>
+        <p class="panel-note quiz-intro">Richte einen virtuellen Sparplan auf den Welt-ETF ein und spul die Zeit vor: Wie fühlt sich ein Sparplan über Monate und Jahre an — mit allen Schwankungen?</p>
+        <div class="depot-plan-row">
+          <span class="depot-plan-label">Sparrate pro Monat</span>
+          <div id="depotPlanAmounts" class="depot-plan-amounts">
+            <button class="mini-btn" data-amount="25">25 €</button>
+            <button class="mini-btn" data-amount="50">50 €</button>
+            <button class="mini-btn" data-amount="100">100 €</button>
+            <button class="mini-btn" data-amount="250">250 €</button>
+          </div>
+        </div>
+        <div class="depot-plan-stats">
+          <div class="stat"><span class="label">Laufzeit</span><span id="depotPlanTime" class="value">—</span></div>
+          <div class="stat"><span class="label">Eingezahlt</span><span id="depotPlanPaid" class="value">0 €</span></div>
+          <div class="stat"><span class="label">Wert ETF</span><span id="depotPlanValue" class="value">0 €</span></div>
+        </div>
+        <div class="controls depot-plan-controls">
+          <button id="depotPlanMonth" class="mini-btn start">⏩ 1 Monat</button>
+          <button id="depotPlanYear" class="mini-btn start">⏭️ 1 Jahr</button>
+        </div>
+        <p id="depotPlanHint" class="panel-note"></p>
+      </div>
+
       <div class="panel broker-cta">
         <span class="broker-cta-badge">Werbung</span>
         <h2 class="broker-cta-title">📈 Bereit für den nächsten Schritt?</h2>
         <p class="broker-cta-text">Das Musterdepot ist reine Übung. Wenn du irgendwann echt investieren willst, kannst du dir hier kostenlos ein Depot bei einem Neobroker eröffnen.</p>
-        <div class="broker-cta-links">
-          <a href="https://www.traderepublic.com/" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="broker-traderepublic">Trade Republic <span class="broker-cta-arrow">→</span></a>
-          <a href="https://de.scalable.capital/" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="broker-scalablecapital">Scalable Capital <span class="broker-cta-arrow">→</span></a>
-        </div>
+        <div class="broker-cta-links" data-placement="depot"></div>
         <p class="broker-cta-disclaimer">Partnerlinks: Meldest du dich über einen dieser Links an, erhalten wir ggf. eine Provision — für dich ändert sich nichts am Preis. Keine Anlageberatung, keine Empfehlung für einen bestimmten Anbieter.</p>
       </div>
 
@@ -285,11 +332,24 @@
           <h2 id="dailyResultTitle">Geschafft!</h2>
           <div id="dailyResultEmojis" class="daily-emojis"></div>
           <p id="dailyResultSummary" class="panel-note"></p>
-          <div class="controls">
+          <div class="controls daily-share-controls">
             <button id="dailyShare" class="btn next" data-goatcounter-click="daily-share">📤 Ergebnis teilen</button>
+            <button id="dailyShareImage" class="mini-btn" data-goatcounter-click="daily-share-image">🖼️ Als Bild teilen</button>
           </div>
           <p id="dailyShareStatus" class="daily-share-status" role="status"></p>
           <p id="dailyCountdown" class="panel-note"></p>
+        </div>
+
+        <div class="panel daily-stats-panel">
+          <h2>📊 Deine Statistik</h2>
+          <div class="daily-stats-grid">
+            <div><span id="dailyStatPlayed" class="ds-value">0</span><span class="ds-label">Gespielt</span></div>
+            <div><span id="dailyStatAvg" class="ds-value">0</span><span class="ds-label">Ø Treffer</span></div>
+            <div><span id="dailyStatStreak" class="ds-value">0</span><span class="ds-label">Serie</span></div>
+            <div><span id="dailyStatMax" class="ds-value">0</span><span class="ds-label">Beste Serie</span></div>
+          </div>
+          <h3 class="ds-subhead">Treffer-Verteilung</h3>
+          <div id="dailyDistribution" class="daily-distribution"></div>
         </div>
         <p class="hint">Bis morgen: <a class="link-btn" href="#spiel" data-goto="game-view">im freien Spiel „Rauf oder Runter“ weiterüben</a></p>
       </div>
@@ -353,12 +413,11 @@
         <span class="broker-cta-badge">Werbung</span>
         <h2 class="broker-cta-title">🌱 Sparplan echt starten?</h2>
         <p class="broker-cta-text">Viele Neobroker bieten ETF-Sparpläne schon ab kleinen Beträgen an. Wenn du soweit bist, kannst du hier ein Depot eröffnen.</p>
-        <div class="broker-cta-links">
-          <a href="https://www.traderepublic.com/" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="broker-traderepublic-sparplan">Trade Republic <span class="broker-cta-arrow">→</span></a>
-          <a href="https://de.scalable.capital/" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="broker-scalablecapital-sparplan">Scalable Capital <span class="broker-cta-arrow">→</span></a>
-        </div>
+        <div class="broker-cta-links" data-placement="sparplan"></div>
         <p class="broker-cta-disclaimer">Partnerlinks: Meldest du dich über einen dieser Links an, erhalten wir ggf. eine Provision — für dich ändert sich nichts am Preis. Keine Anlageberatung, keine Empfehlung für einen bestimmten Anbieter oder ein bestimmtes Produkt.</p>
       </div>
+
+      <div class="ad-slot hidden" data-slot="sparplan"></div>
 
       <p class="hint">Lieber erst üben? <a class="link-btn" href="#depot" data-goto="depot-view">Zum Musterdepot</a></p>
     </section>
@@ -418,7 +477,7 @@
           </article>
           <article class="lex-entry" id="lex-dax" data-match="dax$">
             <h3>DAX</h3>
-            <p>Der Deutsche Aktienindex — der wichtigste deutsche <a class="link-btn" href="#lexikon" data-lex="index">Aktienindex</a>. Er enthält seit 2021 die 40 größten börsennotierten Unternehmen Deutschlands (vorher 30). Der DAX ist ein Performance-Index: Dividenden werden rechnerisch wieder angelegt.</p>
+            <p>Der Deutsche Aktienindex — der wichtigste deutsche <a class="link-btn" href="#lexikon" data-lex="aktienindex">Aktienindex</a>. Er enthält seit 2021 die 40 größten börsennotierten Unternehmen Deutschlands (vorher 30). Der DAX ist ein Performance-Index: Dividenden werden rechnerisch wieder angelegt.</p>
           </article>
           <article class="lex-entry" id="lex-depot" data-match="">
             <h3>Depot</h3>
@@ -438,7 +497,7 @@
           </article>
           <article class="lex-entry" id="lex-etf" data-match="etf$,etfs$">
             <h3>ETF</h3>
-            <p>Exchange Traded Fund — ein börsengehandelter <a class="link-btn" href="#lexikon" data-lex="fonds">Fonds</a>, der meist einfach einen <a class="link-btn" href="#lexikon" data-lex="index">Index</a> nachbildet, z. B. den <a class="link-btn" href="#lexikon" data-lex="msci-world">MSCI World</a>. Mit einem einzigen ETF-Anteil bist du an Hunderten Unternehmen beteiligt. ETFs sind meist deutlich günstiger als aktiv gemanagte Fonds (siehe <a class="link-btn" href="#lexikon" data-lex="ter">TER</a>).</p>
+            <p>Exchange Traded Fund — ein börsengehandelter <a class="link-btn" href="#lexikon" data-lex="fonds">Fonds</a>, der meist einfach einen <a class="link-btn" href="#lexikon" data-lex="aktienindex">Index</a> nachbildet, z. B. den <a class="link-btn" href="#lexikon" data-lex="msci-world">MSCI World</a>. Mit einem einzigen ETF-Anteil bist du an Hunderten Unternehmen beteiligt. ETFs sind meist deutlich günstiger als aktiv gemanagte Fonds (siehe <a class="link-btn" href="#lexikon" data-lex="ter">TER</a>).</p>
           </article>
           <article class="lex-entry" id="lex-ezb" data-match="ezb$,ecb$,europäische zentralbank,european central bank">
             <h3>EZB (Europäische Zentralbank)</h3>
@@ -452,7 +511,7 @@
             <h3>Hebel</h3>
             <p>Hebelprodukte (z. B. Optionsscheine, Knock-out-Zertifikate, CFDs) verstärken die Bewegung eines Basiswerts. Bei einem Hebel von 5 wirkt ein Kursplus von 2 % ungefähr wie 10 % — ein Minus von 2 % aber ebenso wie −10 %. Totalverluste sind möglich; die meisten Privatanleger verlieren mit solchen Produkten Geld.</p>
           </article>
-          <article class="lex-entry" id="lex-index" data-match="">
+          <article class="lex-entry" id="lex-aktienindex" data-match="">
             <h3>Index (Aktienindex)</h3>
             <p>Eine Kennzahl, die die Entwicklung einer Gruppe von Aktien zusammenfasst — z. B. der <a class="link-btn" href="#lexikon" data-lex="dax">DAX</a> für große deutsche oder der <a class="link-btn" href="#lexikon" data-lex="msci-world">MSCI World</a> für große Unternehmen aus Industrieländern. Ein Index zeigt auf einen Blick, wie sich „der Markt" entwickelt.</p>
           </article>
@@ -526,14 +585,74 @@
           </article>
         </div>
 
-        <p class="panel-note">Vereinfachte Erklärungen zum Lernen, Stand 2026 — keine Anlage- oder Steuerberatung.</p>
+        <p class="panel-note">Vereinfachte Erklärungen zum Lernen, Stand 2026 — keine Anlage- oder Steuerberatung. Alle Begriffe gibt es auch als <a href="lexikon/">einzelne Seiten zum Verlinken</a>.</p>
       </div>
+
+      <div class="ad-slot hidden" data-slot="lexikon"></div>
+    </section>
+
+    <section id="lernpfad-view" class="view hidden" data-hash="lernpfad">
+      <button class="back-btn">← Zurück</button>
+      <div class="panel">
+        <h2>🧭 Lernpfad für Einsteiger</h2>
+        <p class="panel-note quiz-intro">Sechs kurze Schritte von „Was ist eine Aktie?" bis zum ersten virtuellen Kauf. Erledigte Schritte hakt die App automatisch ab.</p>
+        <div class="quiz-progress-track"><div id="lernpfadProgressBar" class="quiz-progress-bar"></div></div>
+        <p id="lernpfadProgress" class="lp-progress">0 von 6 Schritten</p>
+        <ol id="lernpfadList" class="lp-list"></ol>
+        <p id="lernpfadDone" class="lp-done hidden">🎉 Geschafft! Du kennst jetzt die wichtigsten Grundlagen. Weiter geht es mit dem Quiz „Mittel" oder der <a class="link-btn" href="#challenge" data-goto="daily-view">Tages-Challenge</a>.</p>
+      </div>
+    </section>
+
+    <section id="erfolge-view" class="view hidden" data-hash="erfolge">
+      <button class="back-btn">← Zurück</button>
+      <div class="panel">
+        <h2>🏅 Erfolge</h2>
+        <div class="quiz-progress-track"><div id="badgeProgressBar" class="quiz-progress-bar"></div></div>
+        <p id="badgeProgress" class="lp-progress">0 von 17</p>
+        <ul id="badgeList" class="badge-grid"></ul>
+        <p class="panel-note">Deine Erfolge werden nur lokal in diesem Browser gespeichert.</p>
+      </div>
+      <div class="panel support-box hidden">
+        <h2>☕ Gefällt dir die App?</h2>
+        <p class="broker-cta-text">Die App ist kostenlos und ohne Tracking-Cookies. Wenn du die Weiterentwicklung unterstützen möchtest, freue ich mich über einen Kaffee.</p>
+        <a class="broker-cta-btn support-link hidden" href="#" target="_blank" rel="noopener noreferrer" data-goatcounter-click="support-erfolge">☕ App unterstützen <span class="broker-cta-arrow">→</span></a>
+      </div>
+    </section>
+
+    <section id="broker-view" class="view hidden" data-hash="broker">
+      <button class="back-btn">← Zurück</button>
+      <div class="panel">
+        <h2>🏦 Echtes Depot eröffnen: Worauf achten?</h2>
+        <p class="panel-note quiz-intro">Wer nach dem Üben echt investieren will, braucht ein Depot bei einer Bank oder einem Broker. Diese Punkte solltest du beim Vergleich prüfen:</p>
+        <ol class="broker-checklist">
+          <li><strong>Kosten pro Order:</strong> Was kostet ein Kauf oder Verkauf? Gibt es Zusatzkosten der Börse (Fremdkosten)?</li>
+          <li><strong>Sparplan:</strong> Welche ETFs gibt es als Sparplan, ab welcher Rate, und kostet die Ausführung etwas?</li>
+          <li><strong>Depotgebühren:</strong> Kostet das Depot selbst etwas — dauerhaft oder erst ab einem Betrag?</li>
+          <li><strong>Sicherheit:</strong> Guthaben auf dem Verrechnungskonto ist bei Banken in der EU gesetzlich bis 100.000 € geschützt. Wertpapiere gehören dir und sind bei der Pleite des Brokers geschützt.</li>
+          <li><strong>Bedienung:</strong> Kommst du mit App und Webseite gut zurecht? Gibt es einen Kundenservice?</li>
+          <li><strong>Steuern:</strong> Ein deutscher Anbieter führt die Abgeltungsteuer automatisch ab und nimmt deinen <a class="link-btn" href="#lexikon" data-lex="sparerpauschbetrag">Freistellungsauftrag</a> an.</li>
+        </ol>
+      </div>
+
+      <div class="panel broker-cta">
+        <span class="broker-cta-badge">Werbung</span>
+        <h2 class="broker-cta-title">Anbieter</h2>
+        <p class="broker-cta-text">Die Auswahl ist keine Empfehlung und kein vollständiger Marktvergleich. Aktuelle Kosten und Bedingungen findest du im Preis- und Leistungsverzeichnis des jeweiligen Anbieters.</p>
+        <ul id="brokerList" class="broker-list"></ul>
+        <p class="broker-cta-disclaimer">Partnerlinks: Meldest du dich über einen dieser Links an, erhalten wir ggf. eine Provision — für dich ändert sich nichts am Preis. Keine Anlageberatung. Investieren ist mit Risiken verbunden, bis hin zum Verlust des eingesetzten Geldes.</p>
+      </div>
+
+      <p class="hint">Noch unsicher? <a class="link-btn" href="#depot" data-goto="depot-view">Erst im Musterdepot üben</a></p>
     </section>
 
     <footer class="app-footer">
       <a href="impressum.html">Impressum</a>
       <a href="datenschutz.html">Datenschutz</a>
+      <a href="lexikon/">Lexikon</a>
+      <a class="support-link hidden" href="#" target="_blank" rel="noopener noreferrer" data-goatcounter-click="support-footer">☕ Unterstützen</a>
     </footer>
+
+  <div id="badgeToast" class="badge-toast hidden" role="status" aria-live="polite"></div>
   </div>
 
   <div id="confirmModal" class="modal-overlay hidden">
