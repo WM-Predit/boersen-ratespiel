@@ -42,3 +42,4 @@ Mehr Details zur Architektur stehen in [`CLAUDE.md`](CLAUDE.md).
 ## Hinweis
 
 Alle Kursverläufe und Aktien (Spiel und Musterdepot) sind rein zufällig simuliert und stellen **keine echten Marktdaten** dar. Die News stammen vom Statistischen Bundesamt und der EZB; Thema, Richtung der Zahl und Relevanz leitet die App automatisch aus dem Text ab (keine Kursprognose). Die App dient nur zum Üben des eigenen Gespürs für Trends, Volatilität und Grundlagenwissen — sie ist **keine Anlageberatung**.
+
