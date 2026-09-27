@@ -40,3 +40,11 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      # Bing & Co. über neue/geänderte Seiten informieren (IndexNow, siehe scripts/indexnow.py). Nur bei Pushes und
+      # manuellen Läufen, nicht bei den stündlichen News-Deploys (dort ist github.event_name "schedule").
+      # Ein Fehler hier darf die bereits erfolgte Veröffentlichung nicht als gescheitert markieren.
+      - name: IndexNow-Meldung
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        run: python3 scripts/indexnow.py
