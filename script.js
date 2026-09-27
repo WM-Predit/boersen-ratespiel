@@ -33,6 +33,11 @@ function openView(viewId) {
   if (viewId === 'daily-view') openDaily();
   if (viewId === 'sparplan-view') renderSparplan();
   if (viewId === 'lexikon-view') resetLexikon();
+  if (viewId === 'news-view') unlockBadge('news_read');
+  if (viewId === 'sparplan-view') unlockBadge('sparplan_used');
+  if (viewId === 'erfolge-view') renderBadges();
+  if (viewId === 'lernpfad-view') renderLernpfad();
+  if (viewId === 'broker-view') renderBrokers();
   const hash = document.getElementById(viewId).dataset.hash;
   if (hash) history.replaceState(null, '', '#' + hash);
   window.scrollTo(0, 0);
@@ -68,6 +73,165 @@ document.addEventListener('click', (e) => {
   if (goto) openView(goto.dataset.goto);
   else openLexikon(lex.dataset.lex);
 });
+
+// --- Erfolge (Abzeichen) ---
+
+// Steht bewusst weit oben: Die Bereiche weiter unten melden Fortschritte über unlockBadge()/markProgress(), und die
+// Konstanten hier müssen dann schon initialisiert sein. Gespeichert wird nur lokal (localStorage).
+const BADGES_STORAGE_KEY = 'boersenspiel_badges';
+const BADGES = [
+  { id: 'challenge_first', icon: '🗓️', name: 'Erster Tag', desc: 'Eine Tages-Challenge abgeschlossen' },
+  { id: 'challenge_perfect', icon: '🎯', name: 'Volltreffer', desc: '5 von 5 in der Tages-Challenge' },
+  { id: 'challenge_streak3', icon: '🔥', name: 'Dranbleiber', desc: 'Tages-Challenge 3 Tage in Folge' },
+  { id: 'challenge_streak7', icon: '📆', name: 'Wochenserie', desc: 'Tages-Challenge 7 Tage in Folge' },
+  { id: 'game_streak5', icon: '📈', name: 'Trendgespür', desc: '5er-Serie in „Rauf oder Runter"' },
+  { id: 'game_streak10', icon: '🚀', name: 'Marktflüsterer', desc: '10er-Serie in „Rauf oder Runter"' },
+  { id: 'quiz_first', icon: '📚', name: 'Wissbegierig', desc: 'Ein Quiz bis zum Ende gespielt' },
+  { id: 'quiz_perfect', icon: '🧠', name: 'Fehlerfrei', desc: 'Ein Quiz-Level ohne Fehler geschafft' },
+  { id: 'quiz_all_perfect', icon: '🏆', name: 'Börsenprofi', desc: 'Alle drei Quiz-Level fehlerfrei' },
+  { id: 'lex_5', icon: '📖', name: 'Nachschlager', desc: '5 Begriffe im Lexikon gelesen' },
+  { id: 'lex_20', icon: '🎓', name: 'Fachsprache', desc: '20 Begriffe im Lexikon gelesen' },
+  { id: 'depot_first_buy', icon: '💼', name: 'Erste Aktie', desc: 'Im Musterdepot etwas gekauft' },
+  { id: 'depot_diversified', icon: '🧺', name: 'Gut gestreut', desc: 'Alle Werte im Musterdepot gleichzeitig gehalten' },
+  { id: 'depot_sparplan_year', icon: '⏩', name: 'Langer Atem', desc: 'Den Depot-Sparplan 1 Jahr laufen lassen' },
+  { id: 'sparplan_used', icon: '🌱', name: 'Vorausgedacht', desc: 'Den Sparplan-Rechner ausprobiert' },
+  { id: 'news_read', icon: '📰', name: 'Informiert', desc: 'Die aktuellen News angesehen' },
+  { id: 'lernpfad_done', icon: '🧭', name: 'Pfadfinder', desc: 'Den Einsteiger-Lernpfad abgeschlossen' },
+];
+
+function loadBadgeState() {
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(BADGES_STORAGE_KEY));
+  } catch (e) {}
+  const state = { earned: {}, lexRead: [], quizDone: [], ...(saved && typeof saved === 'object' ? saved : {}) };
+  if (!state.earned || typeof state.earned !== 'object') state.earned = {};
+  if (!Array.isArray(state.lexRead)) state.lexRead = [];
+  if (!Array.isArray(state.quizDone)) state.quizDone = [];
+  return state;
+}
+
+const badgeState = loadBadgeState();
+
+function saveBadgeState() {
+  try {
+    localStorage.setItem(BADGES_STORAGE_KEY, JSON.stringify(badgeState));
+  } catch (e) {}
+}
+
+function hasBadge(id) {
+  return Boolean(badgeState.earned[id]);
+}
+
+let badgeToastTimer = null;
+const badgeToastQueue = [];
+
+function showNextBadgeToast() {
+  const toast = document.getElementById('badgeToast');
+  if (badgeToastTimer || !badgeToastQueue.length) return;
+  // Mehrere gleichzeitig freigeschaltete Erfolge in einer Meldung zusammenfassen statt nacheinander einzublenden.
+  const batch = badgeToastQueue.splice(0);
+  const title = batch.length > 1 ? `${batch.length} Erfolge freigeschaltet!` : 'Erfolg freigeschaltet!';
+  toast.innerHTML = `<span class="badge-toast-icon">${batch[0].icon}</span><span><strong>${title}</strong><br>${batch.map(b => escapeHtml(b.name)).join(', ')}</span>`;
+  toast.classList.remove('hidden', 'pop');
+  void toast.offsetWidth;
+  toast.classList.add('pop');
+  badgeToastTimer = setTimeout(() => {
+    toast.classList.add('hidden');
+    badgeToastTimer = null;
+    showNextBadgeToast();
+  }, 2600);
+}
+
+function unlockBadge(id) {
+  const badge = BADGES.find(b => b.id === id);
+  if (!badge || hasBadge(id)) return;
+  badgeState.earned[id] = berlinDayKey();
+  saveBadgeState();
+  badgeToastQueue.push(badge);
+  // Kurz sammeln, damit Erfolge aus derselben Aktion (z. B. Quiz beendet + fehlerfrei) zusammen erscheinen.
+  setTimeout(showNextBadgeToast, 50);
+  updateBadgeMenuLabel();
+  renderLernpfad();
+}
+
+// Fortschritte, die keine eigene Anzeige haben, aber für Abzeichen und Lernpfad zählen.
+function markProgress(kind, value) {
+  const list = kind === 'lex' ? badgeState.lexRead : badgeState.quizDone;
+  if (!list.includes(value)) {
+    list.push(value);
+    saveBadgeState();
+  }
+  if (kind === 'lex') {
+    if (badgeState.lexRead.length >= 5) unlockBadge('lex_5');
+    if (badgeState.lexRead.length >= 20) unlockBadge('lex_20');
+  }
+  renderLernpfad();
+}
+
+function updateBadgeMenuLabel() {
+  const count = BADGES.filter(b => hasBadge(b.id)).length;
+  document.getElementById('badgeMenuSub').textContent = count
+    ? `${count} von ${BADGES.length} freigeschaltet`
+    : `${BADGES.length} Abzeichen zum Sammeln`;
+}
+
+function renderBadges() {
+  const list = document.getElementById('badgeList');
+  const count = BADGES.filter(b => hasBadge(b.id)).length;
+  document.getElementById('badgeProgress').textContent = `${count} von ${BADGES.length}`;
+  document.getElementById('badgeProgressBar').style.width = (count / BADGES.length * 100) + '%';
+  list.innerHTML = BADGES.map(b => {
+    const earned = badgeState.earned[b.id];
+    const date = earned ? new Date(earned + 'T12:00:00Z').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+    return `<li class="badge-card${earned ? ' earned' : ''}">
+      <span class="badge-icon">${earned ? b.icon : '🔒'}</span>
+      <span class="badge-name">${escapeHtml(b.name)}</span>
+      <span class="badge-desc">${escapeHtml(b.desc)}</span>
+      ${earned ? `<span class="badge-date">${date}</span>` : ''}
+    </li>`;
+  }).join('');
+}
+
+// --- Lernpfad für Einsteiger ---
+
+const LERNPFAD_STEPS = [
+  { title: 'Was ist eine Aktie?', desc: 'Lies den Lexikon-Eintrag — zwei Minuten, dann weißt du, was du eigentlich kaufst.', action: 'Zum Lexikon', lex: 'aktie', done: () => badgeState.lexRead.includes('aktie') },
+  { title: 'ETFs und Streuung', desc: 'Warum viele Einsteiger mit einem breiten ETF starten.', action: 'Zum Lexikon', lex: 'etf', done: () => badgeState.lexRead.includes('etf') },
+  { title: 'Teste dein Wissen', desc: 'Spiel das Quiz „Leicht" einmal bis zum Ende.', action: 'Zum Quiz', goto: 'learn-view', done: () => badgeState.quizDone.includes('leicht') },
+  { title: 'Die Macht des Zinseszins', desc: 'Rechne im Sparplan-Rechner aus, was aus 50 € im Monat werden kann.', action: 'Zum Rechner', goto: 'sparplan-view', done: () => hasBadge('sparplan_used') },
+  { title: 'Üben ohne Risiko', desc: 'Kauf im Musterdepot deine erste (virtuelle) Aktie.', action: 'Zum Musterdepot', goto: 'depot-view', done: () => hasBadge('depot_first_buy') },
+  { title: 'Gefühl für Kurse', desc: 'Spiel eine Tages-Challenge und sieh, wie zufällig Kurse wirken können.', action: 'Zur Challenge', goto: 'daily-view', done: () => hasBadge('challenge_first') },
+];
+
+function renderLernpfad() {
+  const list = document.getElementById('lernpfadList');
+  if (!list) return;
+  const doneCount = LERNPFAD_STEPS.filter(s => s.done()).length;
+  const nextIndex = LERNPFAD_STEPS.findIndex(s => !s.done());
+  list.innerHTML = LERNPFAD_STEPS.map((s, i) => {
+    const done = s.done();
+    const target = s.lex ? `href="#lexikon" data-lex="${s.lex}"` : `href="#" data-goto="${s.goto}"`;
+    return `<li class="lp-step${done ? ' done' : ''}${i === nextIndex ? ' next' : ''}">
+      <span class="lp-num">${done ? '✓' : i + 1}</span>
+      <span class="lp-body">
+        <span class="lp-title">${s.title}</span>
+        <span class="lp-desc">${s.desc}</span>
+        ${done ? '' : `<a class="mini-btn lp-action" ${target}>${s.action} →</a>`}
+      </span>
+    </li>`;
+  }).join('');
+  document.getElementById('lernpfadProgress').textContent = `${doneCount} von ${LERNPFAD_STEPS.length} Schritten`;
+  document.getElementById('lernpfadProgressBar').style.width = (doneCount / LERNPFAD_STEPS.length * 100) + '%';
+  document.getElementById('lernpfadDone').classList.toggle('hidden', doneCount < LERNPFAD_STEPS.length);
+  document.getElementById('lernpfadMenuSub').textContent = doneCount === LERNPFAD_STEPS.length
+    ? 'Abgeschlossen ✓ — stark!'
+    : doneCount ? `${doneCount} von ${LERNPFAD_STEPS.length} Schritten geschafft` : 'In 6 Schritten zu den Börsen-Basics';
+  if (doneCount === LERNPFAD_STEPS.length && !hasBadge('lernpfad_done')) {
+    unlockBadge('lernpfad_done');
+    burstConfetti();
+  }
+}
 
 const canvas = document.getElementById('chart');
 const ctx = canvas.getContext('2d');
@@ -342,6 +506,8 @@ function showResult(correct, pctChange, timedOut = false) {
       localStorage.setItem('boersenspiel_best', String(best));
     }
     burstConfetti();
+    if (streak >= 5) unlockBadge('game_streak5');
+    if (streak >= 10) unlockBadge('game_streak10');
     if (STREAK_MILESTONES.includes(streak)) {
       showStreakToast(streak, getMultiplier(streak));
     }
@@ -464,10 +630,18 @@ function loadDailyState() {
     date: null,
     results: [],
     streakDays: 0,
+    maxStreak: 0,
     lastCompleted: null,
+    history: {},
     ...(saved && typeof saved === 'object' ? saved : {}),
   };
   if (!Array.isArray(state.results)) state.results = [];
+  if (!state.history || typeof state.history !== 'object') state.history = {};
+  state.maxStreak = Math.max(Number(state.maxStreak) || 0, state.streakDays || 0);
+  // Ergebnisse aus der Zeit vor der Statistik nachtragen, damit der erste Tag nicht fehlt.
+  if (state.lastCompleted && state.date === state.lastCompleted && state.results.length >= DAILY_ROUNDS && !(state.date in state.history)) {
+    state.history[state.date] = state.results.filter(r => r.correct).length;
+  }
   return state;
 }
 
@@ -568,8 +742,16 @@ function dailyGuess(guessUp) {
   if (finished) {
     state.streakDays = state.lastCompleted === shiftDayKey(state.date, -1) ? state.streakDays + 1 : 1;
     state.lastCompleted = state.date;
+    state.maxStreak = Math.max(state.maxStreak, state.streakDays);
+    state.history[state.date] = dailyHits(state);
   }
   saveDailyState(state);
+  if (finished) {
+    unlockBadge('challenge_first');
+    if (dailyHits(state) === DAILY_ROUNDS) unlockBadge('challenge_perfect');
+    if (state.streakDays >= 3) unlockBadge('challenge_streak3');
+    if (state.streakDays >= 7) unlockBadge('challenge_streak7');
+  }
 
   const revealColor = actuallyUp ? '#34d399' : '#fb7185';
   const series = dailySeries;
@@ -621,6 +803,7 @@ function showDailyResult(state) {
   dailyEls.summary.textContent = `Tages-Challenge #${dailyNumber(state.date)}: ${hits} von ${DAILY_ROUNDS} richtig${streakText}`;
   dailyEls.shareStatus.textContent = '';
   if (hits === DAILY_ROUNDS) burstConfetti();
+  renderDailyStatsPanel(state);
   startDailyCountdown();
 }
 
@@ -655,6 +838,113 @@ function startDailyCountdown() {
   dailyCountdownTimer = setInterval(update, 1000);
 }
 
+// Statistik wie bei Wordle: gespielte Tage, Ø Treffer, Serien und Verteilung der Trefferzahlen.
+function renderDailyStatsPanel(state) {
+  const values = Object.values(state.history).filter(v => Number.isInteger(v) && v >= 0 && v <= DAILY_ROUNDS);
+  const played = values.length;
+  const avg = played ? values.reduce((a, b) => a + b, 0) / played : 0;
+  document.getElementById('dailyStatPlayed').textContent = played;
+  document.getElementById('dailyStatAvg').textContent = avg.toLocaleString('de-DE', { maximumFractionDigits: 1 });
+  document.getElementById('dailyStatStreak').textContent = state.streakDays;
+  document.getElementById('dailyStatMax').textContent = state.maxStreak;
+  const counts = Array.from({ length: DAILY_ROUNDS + 1 }, (_, i) => values.filter(v => v === i).length);
+  const maxCount = Math.max(1, ...counts);
+  const today = state.history[state.date];
+  const dist = document.getElementById('dailyDistribution');
+  dist.innerHTML = counts.map((c, i) => i).reverse().map(i => `
+    <div class="dist-row">
+      <span class="dist-label">${i}/${DAILY_ROUNDS}</span>
+      <span class="dist-bar${i === today ? ' today' : ''}" style="width: ${Math.max(8, counts[i] / maxCount * 100)}%">${counts[i]}</span>
+    </div>`).join('');
+}
+
+// Ergebnis als Bild (1080×1080) für Instagram-Storys & Co. Die Kästchen werden gezeichnet statt als Emoji gesetzt —
+// Emojis sehen je nach Gerät unterschiedlich aus oder fehlen im Canvas ganz.
+function drawDailyShareImage(state) {
+  const size = 1080;
+  const c = document.createElement('canvas');
+  c.width = size;
+  c.height = size;
+  const g = c.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, size, size);
+  bg.addColorStop(0, '#0b1024');
+  bg.addColorStop(0.55, '#1a1140');
+  bg.addColorStop(1, '#06070d');
+  g.fillStyle = bg;
+  g.fillRect(0, 0, size, size);
+
+  const glow = g.createRadialGradient(size * 0.8, size * 0.15, 0, size * 0.8, size * 0.15, size * 0.6);
+  glow.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
+  glow.addColorStop(1, 'rgba(99, 102, 241, 0)');
+  g.fillStyle = glow;
+  g.fillRect(0, 0, size, size);
+
+  const font = (weight, px) => `${weight} ${px}px Outfit, -apple-system, "Segoe UI", Roboto, sans-serif`;
+  g.textAlign = 'center';
+  g.fillStyle = '#8d94ac';
+  g.font = font(700, 40);
+  g.fillText('BÖRSEN-RATESPIEL', size / 2, 170);
+  g.fillStyle = '#f3f5fb';
+  g.font = font(800, 76);
+  g.fillText(`Tages-Challenge #${dailyNumber(state.date)}`, size / 2, 270);
+
+  const box = 150, gap = 26;
+  const total = DAILY_ROUNDS * box + (DAILY_ROUNDS - 1) * gap;
+  let x = (size - total) / 2;
+  state.results.forEach(r => {
+    g.fillStyle = r.correct ? '#34d399' : '#fb7185';
+    g.shadowColor = g.fillStyle;
+    g.shadowBlur = 30;
+    g.beginPath();
+    g.roundRect(x, 380, box, box, 28);
+    g.fill();
+    g.shadowBlur = 0;
+    g.fillStyle = 'rgba(6, 7, 13, 0.75)';
+    g.font = font(800, 84);
+    g.fillText(r.correct ? '✓' : '✗', x + box / 2, 380 + box / 2 + 30);
+    x += box + gap;
+  });
+
+  const hits = dailyHits(state);
+  g.fillStyle = '#f3f5fb';
+  g.font = font(800, 150);
+  g.fillText(`${hits}/${DAILY_ROUNDS}`, size / 2, 745);
+  g.fillStyle = '#8d94ac';
+  g.font = font(600, 42);
+  g.fillText(state.streakDays > 1 ? `🔥 ${state.streakDays} Tage in Folge` : 'Kurse richtig getippt', size / 2, 820);
+
+  g.fillStyle = '#60a5fa';
+  g.font = font(700, 44);
+  g.fillText('Schaffst du mehr? boersen-ratespiel.github.io', size / 2, 960);
+  return c;
+}
+
+async function shareDailyImage() {
+  const state = currentDailyState();
+  const canvas = drawDailyShareImage(state);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  if (!blob) return;
+  const file = new File([blob], `boersen-challenge-${dailyNumber(state.date)}.png`, { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], text: dailyShareText(state) });
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+  // Fallback am Desktop: Bild herunterladen.
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  dailyEls.shareStatus.textContent = '🖼️ Bild gespeichert — jetzt z. B. in deiner Instagram-Story posten.';
+}
+
 async function shareDaily() {
   const text = dailyShareText(currentDailyState());
   if (navigator.share) {
@@ -681,6 +971,7 @@ dailyEls.next.addEventListener('click', () => {
   else startDailyRound(state);
 });
 dailyEls.share.addEventListener('click', shareDaily);
+document.getElementById('dailyShareImage').addEventListener('click', shareDailyImage);
 updateDailyMenuLabel();
 
 // --- Musterdepot ---
@@ -694,12 +985,28 @@ const DEPOT_STOCKS_DEFAULT = [
   { id: 'green', name: 'GreenEnergy AG', price: 45 },
   { id: 'handel', name: 'HandelsKette', price: 80 },
   { id: 'bio', name: 'BioPharma', price: 200 },
+  { id: 'welt', name: 'Welt-ETF (fiktiv)', price: 100 },
 ];
+
+// Sparplan im Musterdepot: pro simuliertem Monat wird ein fester Betrag in den fiktiven Welt-ETF investiert.
+// Die Monatsbewegungen sind bewusst grob (Random Walk mit leichtem Aufwärtstrend) — eine Übung, keine Prognose.
+const DEPOT_PLAN_STOCK = 'welt';
+const DEPOT_PLAN_AMOUNTS = [25, 50, 100, 250];
+const DEPOT_MONTH_MOVES = {
+  welt: { drift: 0.005, vol: 0.04 },
+  default: { drift: 0.004, vol: 0.09 },
+};
 
 function loadDepot() {
   try {
     const saved = JSON.parse(localStorage.getItem(DEPOT_STORAGE_KEY));
     if (saved && typeof saved.cash === 'number' && saved.stocks) {
+      // Später ergänzte Werte (z. B. der Welt-ETF) in ältere Depots übernehmen.
+      DEPOT_STOCKS_DEFAULT.forEach(def => {
+        if (!saved.stocks.some(st => st.id === def.id)) saved.stocks.push({ ...def });
+      });
+      saved.holdings = saved.holdings || {};
+      saved.plan = saved.plan || { amount: 0, month: 0, paid: 0 };
       return saved;
     }
   } catch (e) {}
@@ -707,6 +1014,7 @@ function loadDepot() {
     cash: DEPOT_START_CASH,
     stocks: DEPOT_STOCKS_DEFAULT.map(s => ({ ...s })),
     holdings: {},
+    plan: { amount: 0, month: 0, paid: 0 },
   };
 }
 
@@ -764,6 +1072,7 @@ function renderDepot() {
     `;
     list.appendChild(li);
   });
+  renderDepotPlan();
 }
 
 document.getElementById('depotStocks').addEventListener('click', (e) => {
@@ -776,6 +1085,8 @@ document.getElementById('depotStocks').addEventListener('click', (e) => {
     if (depot.cash < DEPOT_BUY_AMOUNT) return;
     depot.cash -= DEPOT_BUY_AMOUNT;
     depot.holdings[stock.id] = (depot.holdings[stock.id] || 0) + DEPOT_BUY_AMOUNT / stock.price;
+    unlockBadge('depot_first_buy');
+    if (depot.stocks.every(s => (depot.holdings[s.id] || 0) > 0)) unlockBadge('depot_diversified');
   } else if (btn.dataset.action === 'sell') {
     const shares = depot.holdings[stock.id] || 0;
     depot.cash += shares * stock.price;
@@ -824,6 +1135,61 @@ function stopDepotLive() {
   document.getElementById('depotLiveHint').classList.add('hidden');
 }
 
+function renderDepotPlan() {
+  const plan = depot.plan;
+  document.querySelectorAll('#depotPlanAmounts button').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.amount) === plan.amount);
+  });
+  const etf = depot.stocks.find(st => st.id === DEPOT_PLAN_STOCK);
+  const value = (depot.holdings[DEPOT_PLAN_STOCK] || 0) * etf.price;
+  const years = Math.floor(plan.month / 12);
+  const months = plan.month % 12;
+  const time = plan.month ? `${years ? `${years} J. ` : ''}${months ? `${months} Mon.` : ''}`.trim() : '—';
+  document.getElementById('depotPlanTime').textContent = time;
+  document.getElementById('depotPlanPaid').textContent = formatEuro(plan.paid);
+  document.getElementById('depotPlanValue').textContent = formatEuro(value);
+  const disabled = !plan.amount;
+  document.getElementById('depotPlanMonth').disabled = disabled;
+  document.getElementById('depotPlanYear').disabled = disabled;
+  document.getElementById('depotPlanHint').textContent = disabled
+    ? 'Wähle zuerst eine monatliche Sparrate.'
+    : depot.cash < plan.amount
+      ? '⚠️ Nicht genug Cash — die nächste Rate fällt aus. Verkaufe etwas oder setze das Depot zurück.'
+      : `Jeden simulierten Monat werden ${formatEuro(plan.amount)} in den Welt-ETF investiert.`;
+}
+
+function simulateDepotMonths(count) {
+  for (let i = 0; i < count; i++) {
+    depot.stocks.forEach(stock => {
+      const move = DEPOT_MONTH_MOVES[stock.id] || DEPOT_MONTH_MOVES.default;
+      const oldPrice = stock.price;
+      stock.price = Math.max(1, stock.price * (1 + move.drift + gaussianRandom() * move.vol));
+      depotTrends[stock.id] = stock.price > oldPrice ? 'up' : 'down';
+    });
+    const etf = depot.stocks.find(st => st.id === DEPOT_PLAN_STOCK);
+    if (depot.plan.amount && depot.cash >= depot.plan.amount) {
+      depot.cash -= depot.plan.amount;
+      depot.holdings[DEPOT_PLAN_STOCK] = (depot.holdings[DEPOT_PLAN_STOCK] || 0) + depot.plan.amount / etf.price;
+      depot.plan.paid += depot.plan.amount;
+    }
+    depot.plan.month++;
+  }
+  if (depot.plan.month >= 12 && depot.plan.paid > 0) unlockBadge('depot_sparplan_year');
+  saveDepot();
+  renderDepot();
+}
+
+document.getElementById('depotPlanAmounts').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-amount]');
+  if (!btn) return;
+  const amount = Number(btn.dataset.amount);
+  depot.plan.amount = depot.plan.amount === amount ? 0 : amount;
+  saveDepot();
+  renderDepotPlan();
+});
+document.getElementById('depotPlanMonth').addEventListener('click', () => simulateDepotMonths(1));
+document.getElementById('depotPlanYear').addEventListener('click', () => simulateDepotMonths(12));
+
 document.getElementById('depotToggle').addEventListener('click', () => {
   if (depotLiveTimer) stopDepotLive(); else startDepotLive();
 });
@@ -858,6 +1224,7 @@ document.getElementById('depotReset').addEventListener('click', () => {
       cash: DEPOT_START_CASH,
       stocks: DEPOT_STOCKS_DEFAULT.map(s => ({ ...s })),
       holdings: {},
+      plan: { amount: 0, month: 0, paid: 0 },
     };
     depotTrends = {};
     saveDepot();
@@ -1365,7 +1732,7 @@ const QUIZ_DATA = {
     { q: 'Was ist ein Depot?', options: ['Ein Konto, auf dem deine Wertpapiere verwahrt werden', 'Ein Tresor für Bargeld', 'Eine Versicherung für Aktien'], correct: 0, explain: 'Ohne Depot kannst du keine Aktien oder ETFs kaufen — es ist quasi das Girokonto für Wertpapiere.', lex: 'depot' },
     { q: 'Was ist eine Rendite?', options: ['Die Gebühr beim Kauf einer Aktie', 'Der Ertrag einer Geldanlage, meist in Prozent pro Jahr', 'Die Anzahl der gekauften Aktien'], correct: 1, explain: 'Rendite = Kursgewinne plus Zinsen oder Dividenden, bezogen auf das eingesetzte Geld.', lex: 'rendite' },
     { q: 'Was beschreibt ein "Bullenmarkt"?', options: ['Eine Phase mit überwiegend steigenden Kursen', 'Eine Phase mit überwiegend fallenden Kursen', 'Einen Markt für Agrarprodukte'], correct: 0, explain: 'Der Bulle stößt mit den Hörnern von unten nach oben — die Kurse steigen.', lex: 'bullenmarkt' },
-    { q: 'Was ist ein Aktienindex?', options: ['Eine Liste der Verlierer des Tages', 'Die Steuernummer einer Aktie', 'Eine Kennzahl, die die Entwicklung mehrerer Aktien zusammenfasst'], correct: 2, explain: 'Ein Index wie der DAX zeigt auf einen Blick, wie sich eine Gruppe von Aktien entwickelt.', lex: 'index' },
+    { q: 'Was ist ein Aktienindex?', options: ['Eine Liste der Verlierer des Tages', 'Die Steuernummer einer Aktie', 'Eine Kennzahl, die die Entwicklung mehrerer Aktien zusammenfasst'], correct: 2, explain: 'Ein Index wie der DAX zeigt auf einen Blick, wie sich eine Gruppe von Aktien entwickelt.', lex: 'aktienindex' },
     { q: 'Was ist Tagesgeld?', options: ['Eine Aktie, die nur einen Tag gehandelt wird', 'Ein verzinstes Konto, über das du täglich verfügen kannst', 'Der Tageslohn an der Börse'], correct: 1, explain: 'Tagesgeld eignet sich gut für den Notgroschen: jederzeit verfügbar, in der EU bis 100.000 € gesetzlich abgesichert.', lex: 'tagesgeld' },
     { q: 'Warum schwanken Aktienkurse?', options: ['Weil sich Angebot und Nachfrage ständig ändern', 'Weil die Börse die Kurse auslost', 'Weil der Staat die Kurse täglich festlegt'], correct: 0, explain: 'Wollen mehr Menschen kaufen als verkaufen, steigt der Kurs — und umgekehrt.', lex: 'boerse' },
     { q: 'Was ist der MSCI World?', options: ['Die Weltbank', 'Ein Aktienindex mit Unternehmen aus vielen Industrieländern', 'Eine internationale Kryptobörse'], correct: 1, explain: 'Der MSCI World enthält rund 1.400 Unternehmen aus 23 Industrieländern und ist bei ETF-Sparplänen sehr beliebt.', lex: 'msci-world' },
@@ -1607,6 +1974,14 @@ function finishQuiz() {
     (gameOver ? ' — keine Leben mehr übrig. Versuch es nochmal!' : perfect ? ' — alle Fragen richtig beantwortet!' : '.');
 
   if (perfect) burstConfetti();
+
+  markProgress('quiz', quiz.levelId);
+  unlockBadge('quiz_first');
+  if (perfect) {
+    markProgress('quiz', 'perfect:' + quiz.levelId);
+    unlockBadge('quiz_perfect');
+    if (LEVELS.every(l => badgeState.quizDone.includes('perfect:' + l.id))) unlockBadge('quiz_all_perfect');
+  }
 }
 
 document.getElementById('resultRetry').addEventListener('click', () => startQuiz(quiz.levelId));
@@ -1780,6 +2155,7 @@ function openLexikon(id) {
   if (!current || current.id !== 'lexikon-view') openView('lexikon-view');
   else resetLexikon();
   lexReturnView = returnTo;
+  markProgress('lex', id);
   entry.classList.remove('lex-highlight');
   void entry.offsetWidth;
   entry.classList.add('lex-highlight');
@@ -1809,6 +2185,100 @@ function lexTermsFor(text) {
     return new RegExp(`(^|[^\\p{L}\\p{N}])${word}($|[^\\p{L}\\p{N}])`, 'u').test(lower);
   }));
 }
+
+// --- Einnahmen: Partnerlinks, Unterstützen, Werbung ---
+
+// ALLE Einstellungen zu Einnahmen stehen hier. Leere Werte = die jeweilige Funktion bleibt unsichtbar.
+//
+// BROKERS[].url: sobald die Partnerprogramme bestätigt sind, hier die persönlichen Affiliate-Links eintragen —
+// sie gelten dann automatisch an allen Stellen (Musterdepot, Sparplan-Rechner, Broker-Vergleich).
+// Weitere Broker (z. B. aus einem Partnernetzwerk wie financeAds oder Awin) einfach als neuen Eintrag ergänzen.
+const BROKERS = [
+  {
+    id: 'traderepublic',
+    name: 'Trade Republic',
+    url: 'https://www.traderepublic.com/',
+    features: ['Aktien, ETFs und Sparpläne', 'Bedienung per App und im Browser'],
+  },
+  {
+    id: 'scalablecapital',
+    name: 'Scalable Capital',
+    url: 'https://de.scalable.capital/',
+    features: ['Aktien, ETFs und Sparpläne', 'Bedienung per App und im Browser'],
+  },
+];
+
+// Link zu Ko-fi, Buy Me a Coffee, PayPal.me o. Ä., z. B. 'https://ko-fi.com/deinname'.
+const SUPPORT_URL = '';
+
+// Google AdSense: Publisher-ID ('ca-pub-…') und je Platzierung die Anzeigenblock-ID ('1234567890').
+// Vor dem Eintragen: in AdSense unter "Datenschutz und Mitteilungen" die DSGVO-Einwilligungsmeldung aktivieren,
+// ads.txt anlegen und den AdSense-Abschnitt in datenschutz.html einkommentieren (siehe CLAUDE.md).
+const ADSENSE_CLIENT = '';
+const ADSENSE_SLOTS = { news: '', lexikon: '', sparplan: '' };
+
+function safeExternalUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+// Broker-Buttons an allen Stellen mit .broker-cta-links[data-placement] aus BROKERS erzeugen.
+function renderBrokerLinks() {
+  document.querySelectorAll('.broker-cta-links[data-placement]').forEach(container => {
+    const placement = container.dataset.placement;
+    container.innerHTML = BROKERS.filter(b => safeExternalUrl(b.url)).map(b => {
+      const event = placement === 'depot' ? `broker-${b.id}` : `broker-${b.id}-${placement}`;
+      return `<a href="${escapeHtml(safeExternalUrl(b.url))}" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="${escapeHtml(event)}">${escapeHtml(b.name)} <span class="broker-cta-arrow">→</span></a>`;
+    }).join('');
+  });
+}
+
+function renderBrokers() {
+  const list = document.getElementById('brokerList');
+  list.innerHTML = BROKERS.filter(b => safeExternalUrl(b.url)).map(b => `
+    <li class="broker-card">
+      <span class="broker-card-name">${escapeHtml(b.name)}</span>
+      <ul class="broker-card-features">${b.features.map(f => `<li>✓ ${escapeHtml(f)}</li>`).join('')}</ul>
+      <a href="${escapeHtml(safeExternalUrl(b.url))}" target="_blank" rel="noopener noreferrer sponsored" class="broker-cta-btn" data-goatcounter-click="broker-${escapeHtml(b.id)}-vergleich">Zu ${escapeHtml(b.name)} <span class="broker-cta-arrow">→</span></a>
+    </li>`).join('');
+}
+
+function initSupport() {
+  const url = safeExternalUrl(SUPPORT_URL);
+  document.querySelectorAll('.support-link').forEach(el => {
+    if (url) el.href = url;
+    el.classList.toggle('hidden', !url);
+  });
+  document.querySelectorAll('.support-box').forEach(el => el.classList.toggle('hidden', !url));
+}
+
+// AdSense wird nur geladen, wenn eine Publisher-ID eingetragen ist. Die Einwilligung (DSGVO) holt Googles eigene
+// Einwilligungsmeldung ein, die in AdSense aktiviert sein muss — ohne sie keine personalisierte Werbung in der EU.
+function initAds() {
+  if (!/^ca-pub-\d+$/.test(ADSENSE_CLIENT)) return;
+  const script = document.createElement('script');
+  script.async = true;
+  script.crossOrigin = 'anonymous';
+  script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(ADSENSE_CLIENT);
+  document.head.appendChild(script);
+  document.querySelectorAll('.ad-slot[data-slot]').forEach(slot => {
+    const id = ADSENSE_SLOTS[slot.dataset.slot];
+    if (!/^\d+$/.test(id || '')) return;
+    slot.innerHTML = `<span class="ad-label">Anzeige</span><ins class="adsbygoogle" style="display:block" data-ad-client="${ADSENSE_CLIENT}" data-ad-slot="${id}" data-ad-format="auto" data-full-width-responsive="true"></ins>`;
+    slot.classList.remove('hidden');
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  });
+}
+
+renderBrokerLinks();
+initSupport();
+initAds();
+updateBadgeMenuLabel();
+renderLernpfad();
 
 // Direktlinks wie https://boersen-ratespiel.github.io/#challenge öffnen gleich die passende Ansicht.
 const initialView = [...views].find(v => v.dataset.hash && '#' + v.dataset.hash === location.hash);
