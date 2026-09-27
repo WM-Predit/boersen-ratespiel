@@ -2193,20 +2193,11 @@ function lexTermsFor(text) {
 // BROKERS[].url: sobald die Partnerprogramme bestätigt sind, hier die persönlichen Affiliate-Links eintragen —
 // sie gelten dann automatisch an allen Stellen (Musterdepot, Sparplan-Rechner, Broker-Vergleich).
 // Weitere Broker (z. B. aus einem Partnernetzwerk wie financeAds oder Awin) einfach als neuen Eintrag ergänzen.
-const BROKERS = [
-  {
-    id: 'traderepublic',
-    name: 'Trade Republic',
-    url: 'https://www.traderepublic.com/',
-    features: ['Aktien, ETFs und Sparpläne', 'Bedienung per App und im Browser'],
-  },
-  {
-    id: 'scalablecapital',
-    name: 'Scalable Capital',
-    url: 'https://de.scalable.capital/',
-    features: ['Aktien, ETFs und Sparpläne', 'Bedienung per App und im Browser'],
-  },
-];
+// Auf Wunsch von Max am 2026-09-27 entfernt: Trade Republic und Scalable Capital. Solange die Liste leer ist, blendet
+// die App alle Broker-Kästen („Werbung") aus; im Bereich „Echtes Depot eröffnen?" bleibt nur die Checkliste.
+// Wieder aktivieren: Einträge nach diesem Muster ergänzen (dann auch Impressum „Werbung" anpassen):
+//   { id: 'traderepublic', name: 'Trade Republic', url: 'https://…', features: ['Aktien, ETFs und Sparpläne'] },
+const BROKERS = [];
 
 // Link zu Ko-fi, Buy Me a Coffee, PayPal.me o. Ä., z. B. 'https://ko-fi.com/deinname'.
 const SUPPORT_URL = '';
@@ -2229,6 +2220,7 @@ function safeExternalUrl(value) {
 // Broker-Buttons an allen Stellen mit .broker-cta-links[data-placement] aus BROKERS erzeugen.
 function renderBrokerLinks() {
   document.querySelectorAll('.broker-cta-links[data-placement]').forEach(container => {
+    container.closest('.broker-cta').classList.toggle('hidden', !BROKERS.length);
     const placement = container.dataset.placement;
     container.innerHTML = BROKERS.filter(b => safeExternalUrl(b.url)).map(b => {
       const event = placement === 'depot' ? `broker-${b.id}` : `broker-${b.id}-${placement}`;
@@ -2239,6 +2231,7 @@ function renderBrokerLinks() {
 
 function renderBrokers() {
   const list = document.getElementById('brokerList');
+  list.closest('.broker-cta').classList.toggle('hidden', !BROKERS.length);
   list.innerHTML = BROKERS.filter(b => safeExternalUrl(b.url)).map(b => `
     <li class="broker-card">
       <span class="broker-card-name">${escapeHtml(b.name)}</span>
