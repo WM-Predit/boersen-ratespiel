@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boersenspiel-v7';
+const CACHE_NAME = 'boersenspiel-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -50,8 +50,12 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
       return fetch(event.request).then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        // Nur erfolgreiche Antworten cachen: Eine einmal gespeicherte 404 (z. B. eine Datei, die erst nach dem Aufruf
+        // veröffentlicht wurde) käme sonst bis zum nächsten CACHE_NAME-Wechsel immer wieder statt der echten Datei.
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
         return response;
       }).catch(() => cached);
     })
