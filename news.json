@@ -1,6 +1,17 @@
 {
-  "updated": "2026-09-25T13:45:45Z",
+  "updated": "2026-09-28T06:51:56Z",
   "items": [
+    {
+      "headline": "Beschäftigte mit Einwanderungsgeschichte 2025 in vielen Mangelberufen überdurchschnittlich stark vertreten",
+      "desc": "Ob in der Produktion und Fertigung, der Gastronomie, der Pflege oder im Personen- und Güterverkehr: In vielen Engpassberufen sind Beschäftigte mit Einwanderungsgeschichte …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Arbeit",
+      "trend": "flat",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_N066_13.html",
+      "published": "2026-09-28T06:00:00Z"
+    },
     {
       "headline": "Auftragseingang im Bauhauptgewerbe im Juli 2026: -9,2 % zum Vormonat",
       "desc": "Der reale (preisbereinigte) Auftragseingang im Bauhauptgewerbe ist im Juli 2026 gegenüber Juni 2026 kalender- und saisonbereinigt um 9,2 % gefallen. Wie das Statistische Bundesamt …",
@@ -101,17 +112,6 @@
       "published": "2026-09-21T06:00:00Z"
     },
     {
-      "headline": "Exporte von neuen Pkw in den ersten sieben Monaten 2026 um 4,0 % zum Vorjahreszeitraum gesunken",
-      "desc": "Von Januar bis Juli 2026 wurden rund 2,0 Millionen neue Pkw im Wert von 73,5 Milliarden Euro aus Deutschland exportiert. Wie das Statistische Bundesamt (Destatis) mitteilt, sanken im …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Konjunktur",
-      "trend": "down",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_332_51.html",
-      "published": "2026-09-21T06:00:00Z"
-    },
-    {
       "headline": "ECB Consumer Expectations Survey results – August 2026",
       "desc": "",
       "source": "Europäische Zentralbank (EZB)",
@@ -121,17 +121,6 @@
       "impact": 1,
       "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260918~295b3ab978.en.html",
       "published": "2026-09-18T08:00:00Z"
-    },
-    {
-      "headline": "Erzeugerpreise im August 2026: +4,6 % gegenüber August 2025",
-      "desc": "Die Erzeugerpreise gewerblicher Produkte waren im August 2026 um 4,6 % höher als im August 2025. Wie das Statistische Bundesamt (Destatis) weiter mitteilt, stiegen die Erzeugerpreise im …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Preise",
-      "trend": "up",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_328_61241.html",
-      "published": "2026-09-18T06:00:00Z"
     },
     {
       "headline": "ECB wage tracker at 2.7% in H1 2027, pointing to a modest uptick in negotiated wage growth",
