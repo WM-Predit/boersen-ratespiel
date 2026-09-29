@@ -1,6 +1,28 @@
 {
-  "updated": "2026-09-28T06:51:56Z",
+  "updated": "2026-09-29T08:28:15Z",
   "items": [
+    {
+      "headline": "Öffentliche Schulden im 2. Quartal 2026 um 1,0 % höher als im Vorquartal",
+      "desc": "Der Öffentliche Gesamthaushalt war beim nicht-öffentlichen Bereich zum Ende des 2. Quartals 2026 mit 2 753,5 Milliarden Euro verschuldet. Wie das Statistische Bundesamt (Destatis) nach …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "up",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_341_713.html",
+      "published": "2026-09-29T06:00:00Z"
+    },
+    {
+      "headline": "95 % des Gesamtwerts steuerpflichtiger Erbschaften und Schenkungen 2025 in Westdeutschland",
+      "desc": "Bei Erbschaften und Schenkungen gibt es deutliche Unterschiede zwischen Ost und West. Im Jahr 2025 entfielen 95 % des Gesamtwerts der steuerlich berücksichtigten Vermögensübertragungen …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "flat",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_40_p002.html",
+      "published": "2026-09-29T06:00:00Z"
+    },
     {
       "headline": "Beschäftigte mit Einwanderungsgeschichte 2025 in vielen Mangelberufen überdurchschnittlich stark vertreten",
       "desc": "Ob in der Produktion und Fertigung, der Gastronomie, der Pflege oder im Personen- und Güterverkehr: In vielen Engpassberufen sind Beschäftigte mit Einwanderungsgeschichte …",
@@ -99,17 +121,6 @@
       "impact": 1,
       "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260921~e754847a7b.en.html",
       "published": "2026-09-21T10:00:00Z"
-    },
-    {
-      "headline": "Kirschenernte 2026 um 7,8 % über Zehnjahresdurchschnitt",
-      "desc": "Die deutschen Obstbaubetriebe haben im Sommer 2026 eine gute Kirschenernte erzielt. Wie das Statistische Bundesamt (Destatis) nach endgültigen Schätzungen zum Stichtag 20. August 2026 …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Wirtschaft",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_334_412.html",
-      "published": "2026-09-21T06:00:00Z"
     },
     {
       "headline": "ECB Consumer Expectations Survey results – August 2026",
