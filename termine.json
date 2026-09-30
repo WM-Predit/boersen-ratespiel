@@ -1,18 +1,6 @@
 {
-  "updated": "2026-09-29T01:56:00Z",
+  "updated": "2026-09-30T00:25:52Z",
   "items": [
-    {
-      "date": "2026-09-29",
-      "time": "08:00",
-      "title": "Schulden des Öffentlichen Gesamthaushalts (vorläufige Ergebnisse)",
-      "period": "2. Quartal 2026",
-      "hint": "",
-      "region": "DE",
-      "key": false,
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
-    },
     {
       "date": "2026-09-30",
       "time": "08:00",
