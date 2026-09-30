@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-30T13:41:39Z",
+  "updated": "2026-09-30T19:18:10Z",
   "items": [
     {
       "headline": "Inflationsrate im September 2026 voraussichtlich +3,3 %",
@@ -154,17 +154,6 @@
       "impact": 1,
       "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260918~295b3ab978.en.html",
       "published": "2026-09-18T08:00:00Z"
-    },
-    {
-      "headline": "ECB wage tracker at 2.7% in H1 2027, pointing to a modest uptick in negotiated wage growth",
-      "desc": "",
-      "source": "Europäische Zentralbank (EZB)",
-      "lang": "en",
-      "category": "Geldpolitik",
-      "trend": "up",
-      "impact": 2,
-      "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260916~7bc58ebef4.en.html",
-      "published": "2026-09-16T08:00:00Z"
     }
   ]
 }
