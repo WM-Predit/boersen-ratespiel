@@ -1,15 +1,26 @@
 {
-  "updated": "2026-09-30T06:41:55Z",
+  "updated": "2026-09-30T13:41:39Z",
   "items": [
     {
-      "headline": "Importpreise im August 2026: +8,3 % gegenüber August 2025",
-      "desc": "Die Importpreise waren im August 2026 um 8,3 % höher als im August 2025. Dies war der stärkste Anstieg gegenüber dem Vorjahresmonat seit Dezember 2022 (+9,6 % gegenüber Dezember 2021). Im …",
+      "headline": "Inflationsrate im September 2026 voraussichtlich +3,3 %",
+      "desc": "Die Inflationsrate in Deutschland wird im September 2026 voraussichtlich +3,3 % betragen. Gemessen wird sie als Veränderung des Verbraucherpreisindex (VPI) zum Vorjahresmonat. Wie das …",
       "source": "Statistisches Bundesamt (Destatis)",
       "lang": "de",
       "category": "Preise",
       "trend": "up",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_344_614.html",
+      "impact": 3,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_348_611.html",
+      "published": "2026-09-30T12:00:00Z"
+    },
+    {
+      "headline": "Erwerbstätigkeit im August 2026 saisonbereinigt gegenüber dem Vormonat gesunken",
+      "desc": "Im August 2026 waren nach Ergebnissen der Erwerbstätigenrechnung rund 45,41 Millionen Personen mit Wohnort in Deutschland (Inländerkonzept) erwerbstätig. Nach vorläufigen Berechnungen des …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Arbeit",
+      "trend": "down",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_347_132.html",
       "published": "2026-09-30T06:00:00Z"
     },
     {
@@ -35,14 +46,14 @@
       "published": "2026-09-30T06:00:00Z"
     },
     {
-      "headline": "Erwerbstätigkeit im August 2026 saisonbereinigt gegenüber dem Vormonat gesunken",
-      "desc": "Im August 2026 waren nach Ergebnissen der Erwerbstätigenrechnung rund 45,41 Millionen Personen mit Wohnort in Deutschland (Inländerkonzept) erwerbstätig. Nach vorläufigen Berechnungen des …",
+      "headline": "Importpreise im August 2026: +8,3 % gegenüber August 2025",
+      "desc": "Die Importpreise waren im August 2026 um 8,3 % höher als im August 2025. Dies war der stärkste Anstieg gegenüber dem Vorjahresmonat seit Dezember 2022 (+9,6 % gegenüber Dezember 2021). Im …",
       "source": "Statistisches Bundesamt (Destatis)",
       "lang": "de",
-      "category": "Arbeit",
-      "trend": "down",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_347_132.html",
+      "category": "Preise",
+      "trend": "up",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_344_614.html",
       "published": "2026-09-30T06:00:00Z"
     },
     {
@@ -88,17 +99,6 @@
       "impact": 1,
       "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_40_p002.html",
       "published": "2026-09-29T06:00:00Z"
-    },
-    {
-      "headline": "Beschäftigte mit Einwanderungsgeschichte 2025 in vielen Mangelberufen überdurchschnittlich stark vertreten",
-      "desc": "Ob in der Produktion und Fertigung, der Gastronomie, der Pflege oder im Personen- und Güterverkehr: In vielen Engpassberufen sind Beschäftigte mit Einwanderungsgeschichte …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Arbeit",
-      "trend": "flat",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_N066_13.html",
-      "published": "2026-09-28T06:00:00Z"
     },
     {
       "headline": "ECB Executive Board member Isabel Schnabel to resign to take senior role at IMF",
