@@ -1,6 +1,50 @@
 {
-  "updated": "2026-09-29T15:50:10Z",
+  "updated": "2026-09-30T06:41:55Z",
   "items": [
+    {
+      "headline": "Importpreise im August 2026: +8,3 % gegenüber August 2025",
+      "desc": "Die Importpreise waren im August 2026 um 8,3 % höher als im August 2025. Dies war der stärkste Anstieg gegenüber dem Vorjahresmonat seit Dezember 2022 (+9,6 % gegenüber Dezember 2021). Im …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Preise",
+      "trend": "up",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_344_614.html",
+      "published": "2026-09-30T06:00:00Z"
+    },
+    {
+      "headline": "Strom- und Gaspreise für Haushalte im 1. Halbjahr 2026 gesunken",
+      "desc": "Die privaten Haushalte in Deutschland haben im 1. Halbjahr 2026 im Durchschnitt 11,58 Cent je Kilowattstunde für Erdgas gezahlt. Wie das Statistische Bundesamt (Destatis) weiter mitteilt …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Preise",
+      "trend": "down",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_345_61243.html",
+      "published": "2026-09-30T06:00:00Z"
+    },
+    {
+      "headline": "Einzelhandelsumsatz im August 2026 real um 1,3 % höher als im Vormonat",
+      "desc": "Der Umsatz der Einzelhandelsunternehmen in Deutschland ist nach vorläufigen Ergebnissen des Statistischen Bundesamtes (Destatis) im August 2026 gegenüber Juli 2026 kalender- und …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Konjunktur",
+      "trend": "up",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_346_45212.html",
+      "published": "2026-09-30T06:00:00Z"
+    },
+    {
+      "headline": "Erwerbstätigkeit im August 2026 saisonbereinigt gegenüber dem Vormonat gesunken",
+      "desc": "Im August 2026 waren nach Ergebnissen der Erwerbstätigenrechnung rund 45,41 Millionen Personen mit Wohnort in Deutschland (Inländerkonzept) erwerbstätig. Nach vorläufigen Berechnungen des …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Arbeit",
+      "trend": "down",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_347_132.html",
+      "published": "2026-09-30T06:00:00Z"
+    },
     {
       "headline": "Beschäftigungsquoten 2025: Mehr Personen mit niedrigem und mittlerem Bildungsabschluss erwerbstätig als 2015",
       "desc": "Die Beschäftigungsquoten von Personen mit mittleren und hohen Bildungsabschlüssen haben sich in Deutschland in den vergangenen zehn Jahren angenähert. Während die Beschäftigungsquote von …",
@@ -57,28 +101,6 @@
       "published": "2026-09-28T06:00:00Z"
     },
     {
-      "headline": "Auftragseingang im Bauhauptgewerbe im Juli 2026: -9,2 % zum Vormonat",
-      "desc": "Der reale (preisbereinigte) Auftragseingang im Bauhauptgewerbe ist im Juli 2026 gegenüber Juni 2026 kalender- und saisonbereinigt um 9,2 % gefallen. Wie das Statistische Bundesamt …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Konjunktur",
-      "trend": "down",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_338_441.html",
-      "published": "2026-09-25T06:00:00Z"
-    },
-    {
-      "headline": "KORREKTUR: 1,3 Millionen Wohngeldhaushalte im Jahr 2025",
-      "desc": "Am Jahresende 2025 haben rund 1,3 Millionen Haushalte in Deutschland Wohngeld bezogen. Das waren 7,2 % oder rund 90 000 Haushalte mehr als ein Jahr zuvor. Wie das Statistische Bundesamt …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Wirtschaft",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_339_22311.html",
-      "published": "2026-09-25T06:00:00Z"
-    },
-    {
       "headline": "ECB Executive Board member Isabel Schnabel to resign to take senior role at IMF",
       "desc": "",
       "source": "Europäische Zentralbank (EZB)",
@@ -88,17 +110,6 @@
       "impact": 1,
       "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260924~bea1dd9824.en.html",
       "published": "2026-09-24T12:00:00Z"
-    },
-    {
-      "headline": "Preise für Wohnimmobilien im 2. Quartal 2026: +0,6 % zum Vorjahresquartal",
-      "desc": "Die Preise für Wohnimmobilien (Häuserpreisindex) in Deutschland sind im 2. Quartal 2026 um durchschnittlich 0,6 % gegenüber dem 2. Quartal 2025 gestiegen. Gegenüber dem 1. Quartal 2026 …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Preise",
-      "trend": "up",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_336_61262.html",
-      "published": "2026-09-24T06:00:00Z"
     },
     {
       "headline": "Almost ten million people took part in ECB survey on new euro banknotes",
