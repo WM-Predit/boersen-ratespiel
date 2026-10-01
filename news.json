@@ -1,6 +1,39 @@
 {
-  "updated": "2026-09-30T19:18:10Z",
+  "updated": "2026-10-01T13:11:05Z",
   "items": [
+    {
+      "headline": "Europäischer Statistikwettbewerb für Schülerinnen und Schüler startet wieder",
+      "desc": "Das Statistische Bundesamt (Destatis) organisiert im Schuljahr 2026/27 zum fünften Mal den Europäischen Statistikwettbewerb (European Statistics Competition, kurz: ESC) in Deutschland. Der …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "flat",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_350_p001.html",
+      "published": "2026-10-01T06:00:00Z"
+    },
+    {
+      "headline": "Produktion von Benzin und Diesel im 1. Halbjahr 2026 gestiegen",
+      "desc": "Die Produktion von Benzin und Diesel in Deutschland ist zuletzt gestiegen. Im 1. Halbjahr 2026 haben die Raffinerien hierzulande 11,0 Millionen Tonnen Motorenbenzin (einschließlich …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Konjunktur",
+      "trend": "up",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_N068_51.html",
+      "published": "2026-10-01T06:00:00Z"
+    },
+    {
+      "headline": "Kommunales Finanzierungsdefizit im 1. Halbjahr 2026 erneut bei 20,1 Milliarden Euro",
+      "desc": "Die Kern- und Extrahaushalte der Gemeinden und Gemeindeverbände (ohne Stadtstaaten) in Deutschland wiesen im 1. Halbjahr 2026 ein Finanzierungsdefizit von 20,1 Milliarden Euro auf. Wie das …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "flat",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_349_71137.html",
+      "published": "2026-10-01T06:00:00Z"
+    },
     {
       "headline": "Inflationsrate im September 2026 voraussichtlich +3,3 %",
       "desc": "Die Inflationsrate in Deutschland wird im September 2026 voraussichtlich +3,3 % betragen. Gemessen wird sie als Veränderung des Verbraucherpreisindex (VPI) zum Vorjahresmonat. Wie das …",
@@ -77,28 +110,6 @@
       "impact": 3,
       "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260929~050089e922.en.html",
       "published": "2026-09-29T08:00:00Z"
-    },
-    {
-      "headline": "Öffentliche Schulden im 2. Quartal 2026 um 1,0 % höher als im Vorquartal",
-      "desc": "Der Öffentliche Gesamthaushalt war beim nicht-öffentlichen Bereich zum Ende des 2. Quartals 2026 mit 2 753,5 Milliarden Euro verschuldet. Wie das Statistische Bundesamt (Destatis) nach …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Wirtschaft",
-      "trend": "up",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_341_713.html",
-      "published": "2026-09-29T06:00:00Z"
-    },
-    {
-      "headline": "95 % des Gesamtwerts steuerpflichtiger Erbschaften und Schenkungen 2025 in Westdeutschland",
-      "desc": "Bei Erbschaften und Schenkungen gibt es deutliche Unterschiede zwischen Ost und West. Im Jahr 2025 entfielen 95 % des Gesamtwerts der steuerlich berücksichtigten Vermögensübertragungen …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Wirtschaft",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_40_p002.html",
-      "published": "2026-09-29T06:00:00Z"
     },
     {
       "headline": "ECB Executive Board member Isabel Schnabel to resign to take senior role at IMF",
