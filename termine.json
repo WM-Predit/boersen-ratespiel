@@ -1,30 +1,6 @@
 {
-  "updated": "2026-09-30T23:47:34Z",
+  "updated": "2026-10-01T23:11:23Z",
   "items": [
-    {
-      "date": "2026-10-01",
-      "time": "08:00",
-      "title": "Außenhandel mit und Produktion von Benzin und Diesel",
-      "period": "1. Halbjahr 2026",
-      "hint": "",
-      "region": "DE",
-      "key": false,
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
-    },
-    {
-      "date": "2026-10-01",
-      "time": "08:00",
-      "title": "Kommunale Haushalte (Gemeindefinanzen, vierteljährliche Kassenstatistik)",
-      "period": "1. Halbjahr 2026",
-      "hint": "",
-      "region": "DE",
-      "key": false,
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
-    },
     {
       "date": "2026-10-06",
       "time": "14:30",
