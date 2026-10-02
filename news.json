@@ -1,6 +1,17 @@
 {
-  "updated": "2026-10-01T18:52:53Z",
+  "updated": "2026-10-02T08:33:29Z",
   "items": [
+    {
+      "headline": "Öffentliches Finanzierungsdefizit im 1. Halbjahr 2026 bei 98,8 Milliarden Euro",
+      "desc": "Der Öffentliche Gesamthaushalt hat im 1. Halbjahr 2026 rund 2 % mehr eingenommen und rund 6 % mehr ausgegeben als im 1. Halbjahr 2025: Einnahmen von 1 011,8 Milliarden Euro standen Ausgaben …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "flat",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_351_711.html",
+      "published": "2026-10-02T06:00:00Z"
+    },
     {
       "headline": "Europäischer Statistikwettbewerb für Schülerinnen und Schüler startet wieder",
       "desc": "Das Statistische Bundesamt (Destatis) organisiert im Schuljahr 2026/27 zum fünften Mal den Europäischen Statistikwettbewerb (European Statistics Competition, kurz: ESC) in Deutschland. Der …",
@@ -77,28 +88,6 @@
       "impact": 2,
       "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_346_45212.html",
       "published": "2026-09-30T06:00:00Z"
-    },
-    {
-      "headline": "Importpreise im August 2026: +8,3 % gegenüber August 2025",
-      "desc": "Die Importpreise waren im August 2026 um 8,3 % höher als im August 2025. Dies war der stärkste Anstieg gegenüber dem Vorjahresmonat seit Dezember 2022 (+9,6 % gegenüber Dezember 2021). Im …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Preise",
-      "trend": "up",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_344_614.html",
-      "published": "2026-09-30T06:00:00Z"
-    },
-    {
-      "headline": "Beschäftigungsquoten 2025: Mehr Personen mit niedrigem und mittlerem Bildungsabschluss erwerbstätig als 2015",
-      "desc": "Die Beschäftigungsquoten von Personen mit mittleren und hohen Bildungsabschlüssen haben sich in Deutschland in den vergangenen zehn Jahren angenähert. Während die Beschäftigungsquote von …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Arbeit",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_343_213.html",
-      "published": "2026-09-29T09:00:00Z"
     },
     {
       "headline": "ECB amends monetary policy implementation guidelines as part of regular review",

@@ -1,6 +1,30 @@
 {
-  "updated": "2026-10-01T23:11:23Z",
+  "updated": "2026-10-02T08:33:32Z",
   "items": [
+    {
+      "date": "2026-10-06",
+      "time": "08:00",
+      "title": "Umsatz im Dienstleistungsbereich",
+      "period": "Juli 2026",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-06",
+      "time": "08:00",
+      "title": "Verarbeitendes Gewerbe (Auftragseingang und Umsatz)",
+      "period": "August 2026",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
     {
       "date": "2026-10-06",
       "time": "14:30",
@@ -12,6 +36,66 @@
       "source": "U.S. Bureau of Economic Analysis (BEA)",
       "lang": "en",
       "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "date": "2026-10-07",
+      "time": "08:00",
+      "title": "Produktionsindex",
+      "period": "August 2026",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-07",
+      "time": "08:00",
+      "title": "Zum Welttag des Hundes am 10.10.2026: Einnahmen aus der Hundesteuer sowie Preise von Hunde- und Katzenfutter",
+      "period": "Jahr 2025",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-08",
+      "time": "08:00",
+      "title": "Außenhandel",
+      "period": "August 2026",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-09",
+      "time": "08:00",
+      "title": "Baupreise für Wohngebäude",
+      "period": "August 2026",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-09",
+      "time": "08:00",
+      "title": "Insolvenzen",
+      "period": "Juli 2026",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
     }
   ]
 }
