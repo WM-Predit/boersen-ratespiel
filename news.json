@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-02T08:33:29Z",
+  "updated": "2026-10-02T15:47:40Z",
   "items": [
     {
       "headline": "Öffentliches Finanzierungsdefizit im 1. Halbjahr 2026 bei 98,8 Milliarden Euro",
@@ -121,28 +121,6 @@
       "impact": 1,
       "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260923~6ebddaf01e.en.html",
       "published": "2026-09-23T09:00:00Z"
-    },
-    {
-      "headline": "ECB to invest part of own funds in tokenised securities, with settlement via Pontes",
-      "desc": "",
-      "source": "Europäische Zentralbank (EZB)",
-      "lang": "en",
-      "category": "Geldpolitik",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260921_1~5a011ecbea.en.html",
-      "published": "2026-09-21T10:00:00Z"
-    },
-    {
-      "headline": "Eurosystem brings central bank money to tokenised finance",
-      "desc": "",
-      "source": "Europäische Zentralbank (EZB)",
-      "lang": "en",
-      "category": "Wirtschaft",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260921~e754847a7b.en.html",
-      "published": "2026-09-21T10:00:00Z"
     }
   ]
 }
