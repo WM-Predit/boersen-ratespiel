@@ -1,6 +1,28 @@
 {
-  "updated": "2026-10-02T15:47:40Z",
+  "updated": "2026-10-06T07:33:10Z",
   "items": [
+    {
+      "headline": "Auftragseingang im Verarbeitenden Gewerbe im August 2026: -10,6 % zum Vormonat",
+      "desc": "Der reale (preisbereinigte) Auftragseingang im Verarbeitenden Gewerbe ist nach vorläufigen Angaben des Statistischen Bundesamtes (Destatis) im August 2026 gegenüber Juli 2026 saison- und …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Konjunktur",
+      "trend": "down",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_354_421.html",
+      "published": "2026-10-06T06:00:00Z"
+    },
+    {
+      "headline": "Umsatz im Dienstleistungsbereich im Juli 2026 um 0,7 % höher als im Vormonat",
+      "desc": "Der Dienstleistungssektor in Deutschland (ohne Finanz- und Versicherungsdienstleistungen) hat im Juli 2026 nach vorläufigen Ergebnissen des Statistischen Bundesamtes (Destatis) kalender …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Konjunktur",
+      "trend": "up",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_353_474.html",
+      "published": "2026-10-06T06:00:00Z"
+    },
     {
       "headline": "Öffentliches Finanzierungsdefizit im 1. Halbjahr 2026 bei 98,8 Milliarden Euro",
       "desc": "Der Öffentliche Gesamthaushalt hat im 1. Halbjahr 2026 rund 2 % mehr eingenommen und rund 6 % mehr ausgegeben als im 1. Halbjahr 2025: Einnahmen von 1 011,8 Milliarden Euro standen Ausgaben …",
@@ -55,39 +77,6 @@
       "impact": 3,
       "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_348_611.html",
       "published": "2026-09-30T12:00:00Z"
-    },
-    {
-      "headline": "Erwerbstätigkeit im August 2026 saisonbereinigt gegenüber dem Vormonat gesunken",
-      "desc": "Im August 2026 waren nach Ergebnissen der Erwerbstätigenrechnung rund 45,41 Millionen Personen mit Wohnort in Deutschland (Inländerkonzept) erwerbstätig. Nach vorläufigen Berechnungen des …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Arbeit",
-      "trend": "down",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_347_132.html",
-      "published": "2026-09-30T06:00:00Z"
-    },
-    {
-      "headline": "Strom- und Gaspreise für Haushalte im 1. Halbjahr 2026 gesunken",
-      "desc": "Die privaten Haushalte in Deutschland haben im 1. Halbjahr 2026 im Durchschnitt 11,58 Cent je Kilowattstunde für Erdgas gezahlt. Wie das Statistische Bundesamt (Destatis) weiter mitteilt …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Preise",
-      "trend": "down",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_345_61243.html",
-      "published": "2026-09-30T06:00:00Z"
-    },
-    {
-      "headline": "Einzelhandelsumsatz im August 2026 real um 1,3 % höher als im Vormonat",
-      "desc": "Der Umsatz der Einzelhandelsunternehmen in Deutschland ist nach vorläufigen Ergebnissen des Statistischen Bundesamtes (Destatis) im August 2026 gegenüber Juli 2026 kalender- und …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Konjunktur",
-      "trend": "up",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_346_45212.html",
-      "published": "2026-09-30T06:00:00Z"
     },
     {
       "headline": "ECB amends monetary policy implementation guidelines as part of regular review",
