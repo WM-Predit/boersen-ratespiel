@@ -1,42 +1,6 @@
 {
-  "updated": "2026-10-02T08:33:32Z",
+  "updated": "2026-10-07T00:41:05Z",
   "items": [
-    {
-      "date": "2026-10-06",
-      "time": "08:00",
-      "title": "Umsatz im Dienstleistungsbereich",
-      "period": "Juli 2026",
-      "hint": "",
-      "region": "DE",
-      "key": false,
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
-    },
-    {
-      "date": "2026-10-06",
-      "time": "08:00",
-      "title": "Verarbeitendes Gewerbe (Auftragseingang und Umsatz)",
-      "period": "August 2026",
-      "hint": "",
-      "region": "DE",
-      "key": false,
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
-    },
-    {
-      "date": "2026-10-06",
-      "time": "14:30",
-      "title": "U.S. International Trade in Goods and Services, August 2026",
-      "period": "",
-      "hint": "Außenhandel der USA",
-      "region": "US",
-      "key": false,
-      "source": "U.S. Bureau of Economic Analysis (BEA)",
-      "lang": "en",
-      "url": "https://www.bea.gov/news/schedule"
-    },
     {
       "date": "2026-10-07",
       "time": "08:00",
