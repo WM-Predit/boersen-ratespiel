@@ -1,6 +1,28 @@
 {
-  "updated": "2026-10-06T15:09:59Z",
+  "updated": "2026-10-07T07:13:01Z",
   "items": [
+    {
+      "headline": "Einnahmen aus Hundesteuer stagnieren 2025 auf hohem Niveau",
+      "desc": "Hundehaltung bringt dem Staat weiter hohe Einnahmen, wenn auch der stetige Zuwachs der Vorjahre gestoppt ist. Wie das Statistische Bundesamt (Destatis) anlässlich des Welthundetags am 10. …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "flat",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_N069_73.html",
+      "published": "2026-10-07T06:00:00Z"
+    },
+    {
+      "headline": "Produktion im August 2026: +2,0 % zum Vormonat",
+      "desc": "Die reale (preisbereinigte) Produktion im Produzierenden Gewerbe ist nach vorläufigen Angaben des Statistischen Bundesamtes (Destatis) im August 2026 gegenüber Juli 2026 saison- und …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Konjunktur",
+      "trend": "up",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_355_421.html",
+      "published": "2026-10-07T06:00:00Z"
+    },
     {
       "headline": "Auftragseingang im Verarbeitenden Gewerbe im August 2026: -10,6 % zum Vormonat",
       "desc": "Der reale (preisbereinigte) Auftragseingang im Verarbeitenden Gewerbe ist nach vorläufigen Angaben des Statistischen Bundesamtes (Destatis) im August 2026 gegenüber Juli 2026 saison- und …",
@@ -66,17 +88,6 @@
       "impact": 1,
       "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_349_71137.html",
       "published": "2026-10-01T06:00:00Z"
-    },
-    {
-      "headline": "Inflationsrate im September 2026 voraussichtlich +3,3 %",
-      "desc": "Die Inflationsrate in Deutschland wird im September 2026 voraussichtlich +3,3 % betragen. Gemessen wird sie als Veränderung des Verbraucherpreisindex (VPI) zum Vorjahresmonat. Wie das …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Preise",
-      "trend": "up",
-      "impact": 3,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/09/PD26_348_611.html",
-      "published": "2026-09-30T12:00:00Z"
     },
     {
       "headline": "ECB amends monetary policy implementation guidelines as part of regular review",
