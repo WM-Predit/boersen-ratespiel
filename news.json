@@ -1,6 +1,28 @@
 {
-  "updated": "2026-10-07T14:29:47Z",
+  "updated": "2026-10-08T07:22:48Z",
   "items": [
+    {
+      "headline": "Exporte im August 2026: -0,8 % zum Juli 2026",
+      "desc": "Im August 2026 sind die deutschen Exporte gegenüber Juli 2026 kalender- und saisonbereinigt um 0,8 % gesunken und die Importe um 0,9 % gestiegen. Im Vergleich zum Vorjahresmonat August 2025 …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Konjunktur",
+      "trend": "down",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_356_51.html",
+      "published": "2026-10-08T06:00:00Z"
+    },
+    {
+      "headline": "Krankheitskosten im Jahr 2024 um 7,6 % gestiegen",
+      "desc": "Krankheiten und Gesundheitsprobleme haben im Jahr 2024 in Deutschland direkte Kosten von 528,5 Milliarden Euro verursacht. Wie das Statistische Bundesamt (Destatis) mitteilt, stiegen die …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "up",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_359_236.html",
+      "published": "2026-10-08T06:00:00Z"
+    },
     {
       "headline": "Results of the September 2026 survey on credit terms and conditions in euro-denominated securities financing and OTC derivatives markets (SESFOD)",
       "desc": "",
@@ -57,50 +79,6 @@
       "published": "2026-10-06T06:00:00Z"
     },
     {
-      "headline": "Öffentliches Finanzierungsdefizit im 1. Halbjahr 2026 bei 98,8 Milliarden Euro",
-      "desc": "Der Öffentliche Gesamthaushalt hat im 1. Halbjahr 2026 rund 2 % mehr eingenommen und rund 6 % mehr ausgegeben als im 1. Halbjahr 2025: Einnahmen von 1 011,8 Milliarden Euro standen Ausgaben …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Wirtschaft",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_351_711.html",
-      "published": "2026-10-02T06:00:00Z"
-    },
-    {
-      "headline": "Europäischer Statistikwettbewerb für Schülerinnen und Schüler startet wieder",
-      "desc": "Das Statistische Bundesamt (Destatis) organisiert im Schuljahr 2026/27 zum fünften Mal den Europäischen Statistikwettbewerb (European Statistics Competition, kurz: ESC) in Deutschland. Der …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Wirtschaft",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_350_p001.html",
-      "published": "2026-10-01T06:00:00Z"
-    },
-    {
-      "headline": "Produktion von Benzin und Diesel im 1. Halbjahr 2026 gestiegen",
-      "desc": "Die Produktion von Benzin und Diesel in Deutschland ist zuletzt gestiegen. Im 1. Halbjahr 2026 haben die Raffinerien hierzulande 11,0 Millionen Tonnen Motorenbenzin (einschließlich …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Konjunktur",
-      "trend": "up",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_N068_51.html",
-      "published": "2026-10-01T06:00:00Z"
-    },
-    {
-      "headline": "Kommunales Finanzierungsdefizit im 1. Halbjahr 2026 erneut bei 20,1 Milliarden Euro",
-      "desc": "Die Kern- und Extrahaushalte der Gemeinden und Gemeindeverbände (ohne Stadtstaaten) in Deutschland wiesen im 1. Halbjahr 2026 ein Finanzierungsdefizit von 20,1 Milliarden Euro auf. Wie das …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Wirtschaft",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_349_71137.html",
-      "published": "2026-10-01T06:00:00Z"
-    },
-    {
       "headline": "ECB amends monetary policy implementation guidelines as part of regular review",
       "desc": "",
       "source": "Europäische Zentralbank (EZB)",
@@ -110,17 +88,6 @@
       "impact": 3,
       "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260929~050089e922.en.html",
       "published": "2026-09-29T08:00:00Z"
-    },
-    {
-      "headline": "ECB Executive Board member Isabel Schnabel to resign to take senior role at IMF",
-      "desc": "",
-      "source": "Europäische Zentralbank (EZB)",
-      "lang": "en",
-      "category": "Geldpolitik",
-      "trend": "flat",
-      "impact": 1,
-      "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260924~bea1dd9824.en.html",
-      "published": "2026-09-24T12:00:00Z"
     }
   ]
 }
