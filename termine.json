@@ -1,30 +1,6 @@
 {
-  "updated": "2026-10-07T00:41:05Z",
+  "updated": "2026-10-08T00:59:02Z",
   "items": [
-    {
-      "date": "2026-10-07",
-      "time": "08:00",
-      "title": "Produktionsindex",
-      "period": "August 2026",
-      "hint": "",
-      "region": "DE",
-      "key": false,
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
-    },
-    {
-      "date": "2026-10-07",
-      "time": "08:00",
-      "title": "Zum Welttag des Hundes am 10.10.2026: Einnahmen aus der Hundesteuer sowie Preise von Hunde- und Katzenfutter",
-      "period": "Jahr 2025",
-      "hint": "",
-      "region": "DE",
-      "key": false,
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
-    },
     {
       "date": "2026-10-08",
       "time": "08:00",
