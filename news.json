@@ -1,6 +1,28 @@
 {
-  "updated": "2026-10-08T07:22:48Z",
+  "updated": "2026-10-09T09:01:25Z",
   "items": [
+    {
+      "headline": "Unternehmensinsolvenzen im Juli 2026: +8,0 % gegenüber Juli 2025",
+      "desc": "Im Juli 2026 haben die deutschen Amtsgerichte 2 373 beantragte Unternehmensinsolvenzen registriert. Wie das Statistische Bundesamt (Destatis) mitteilt, waren das 8,0 % mehr als im …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Wirtschaft",
+      "trend": "up",
+      "impact": 2,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_362_52411.html",
+      "published": "2026-10-09T06:00:00Z"
+    },
+    {
+      "headline": "Baupreise für Wohngebäude im August 2026: +5,5 % gegenüber August 2025",
+      "desc": "Die Preise für den Neubau konventionell gefertigter Wohngebäude in Deutschland sind im August 2026 gegenüber August 2025 um 5,5 % gestiegen. Im Mai 2026, dem vorherigen Berichtsmonat der …",
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "category": "Preise",
+      "trend": "up",
+      "impact": 1,
+      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html",
+      "published": "2026-10-09T06:00:00Z"
+    },
     {
       "headline": "Exporte im August 2026: -0,8 % zum Juli 2026",
       "desc": "Im August 2026 sind die deutschen Exporte gegenüber Juli 2026 kalender- und saisonbereinigt um 0,8 % gesunken und die Importe um 0,9 % gestiegen. Im Vergleich zum Vorjahresmonat August 2025 …",
@@ -55,28 +77,6 @@
       "impact": 2,
       "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_355_421.html",
       "published": "2026-10-07T06:00:00Z"
-    },
-    {
-      "headline": "Auftragseingang im Verarbeitenden Gewerbe im August 2026: -10,6 % zum Vormonat",
-      "desc": "Der reale (preisbereinigte) Auftragseingang im Verarbeitenden Gewerbe ist nach vorläufigen Angaben des Statistischen Bundesamtes (Destatis) im August 2026 gegenüber Juli 2026 saison- und …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Konjunktur",
-      "trend": "down",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_354_421.html",
-      "published": "2026-10-06T06:00:00Z"
-    },
-    {
-      "headline": "Umsatz im Dienstleistungsbereich im Juli 2026 um 0,7 % höher als im Vormonat",
-      "desc": "Der Dienstleistungssektor in Deutschland (ohne Finanz- und Versicherungsdienstleistungen) hat im Juli 2026 nach vorläufigen Ergebnissen des Statistischen Bundesamtes (Destatis) kalender …",
-      "source": "Statistisches Bundesamt (Destatis)",
-      "lang": "de",
-      "category": "Konjunktur",
-      "trend": "up",
-      "impact": 2,
-      "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_353_474.html",
-      "published": "2026-10-06T06:00:00Z"
     },
     {
       "headline": "ECB amends monetary policy implementation guidelines as part of regular review",

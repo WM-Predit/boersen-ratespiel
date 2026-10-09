@@ -1,10 +1,22 @@
 {
-  "updated": "2026-10-09T02:08:11Z",
+  "updated": "2026-10-09T09:01:27Z",
   "items": [
     {
-      "date": "2026-10-09",
+      "date": "2026-10-13",
       "time": "08:00",
-      "title": "Baupreise für Wohngebäude",
+      "title": "Verbraucherpreisindex (inklusive Harmonisierter Verbraucherpreisindex), endgültige Ergebnisse",
+      "period": "September 2026",
+      "hint": "",
+      "region": "DE",
+      "key": true,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-14",
+      "time": "08:00",
+      "title": "Erzeugerpreise landwirtschaftlicher Produkte",
       "period": "August 2026",
       "hint": "",
       "region": "DE",
@@ -14,10 +26,46 @@
       "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
     },
     {
-      "date": "2026-10-09",
+      "date": "2026-10-14",
       "time": "08:00",
-      "title": "Insolvenzen",
-      "period": "Juli 2026",
+      "title": "Großhandelspreise",
+      "period": "September 2026",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-15",
+      "time": "08:00",
+      "title": "Einnahmen der Kommunen aus Grund- und Gewerbesteuer (Realsteuereinnahmen)",
+      "period": "Jahr 2025",
+      "hint": "",
+      "region": "DE",
+      "key": false,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-15",
+      "time": "08:00",
+      "title": "Verbraucherpreise, Erzeugerpreise und Ernte von Kartoffeln",
+      "period": "August/September/Jahr 2026",
+      "hint": "",
+      "region": "DE",
+      "key": true,
+      "source": "Statistisches Bundesamt (Destatis)",
+      "lang": "de",
+      "url": "https://www.destatis.de/DE/Presse/Wochenvorschau/_inhalt.html"
+    },
+    {
+      "date": "2026-10-16",
+      "time": "08:00",
+      "title": "Baugenehmigungen",
+      "period": "August 2026",
       "hint": "",
       "region": "DE",
       "key": false,
